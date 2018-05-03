@@ -1,26 +1,26 @@
 #import dependencies
-rm(list = ls())
-library(ggplot2)
-library(reshape2)
-library(dplyr)
-library(nlme)
-library(car)
-library(multcomp)
-library(scales)
+rm(list = ls())     #reset the environment, remove all old values
+library(ggplot2)    #library for plotting
+library(reshape2)     #needed for melting data into long format
+library(dplyr)    #needed for grouping data by nested subgroups using %>%
+library(nlme)     #needed for making mixed linear models
+library(car)    #needed for good anova function that can take a mixed linear model
+library(multcomp)     #needed for doing multiple comparisons for the mixed two-factor ANOVA
+library(scales)     #contains pretty_breaks() which allows for publication-quality x axes
 #defining functions for analysis
-results <- as.data.frame(matrix(NA, nrow = 1, ncol = 9))
-results2 <- as.data.frame(matrix(NA, nrow = 1, ncol = 11))
-colnames(results) <- c("Filename","Condition", "Lower Left", "Lower Right", "Upper Left", "Upper Right", "Performance Index", "Freezing", "Open Field")
+results <- as.data.frame(matrix(NA, nrow = 1, ncol = 9))    #creates empty matrix for displaying summary results on first page
+results2 <- as.data.frame(matrix(NA, nrow = 1, ncol = 11))    #creates empty matrix for storing extended results for manipulation and export
+colnames(results) <- c("Filename","Condition", "Lower Left", "Lower Right", "Upper Left", "Upper Right", "Performance Index", "Freezing", "Open Field")     
 colnames(results2) <- c("Filename","Condition", "Lower Left", "Lower Right", "Upper Left", "Upper Right", "Performance Index", "Freezing", "Open Field", "Group", "Sequence")
-summarized <- as.data.frame(matrix(NA, nrow = 1, ncol = 6))
+summarized <- as.data.frame(matrix(NA, nrow = 1, ncol = 6))     #creates empty matrix for displaying metadata on first page
 colnames(summarized) <- c("Filename", "Treatment", "Baseline On", "Baseline Off", "Treatment On", "Treatment Off")
-conditionlist <- "Full"
+conditionlist <- "Full"     #creates list of conditions, enters "Full" as first input, because there is no input to define the condition and it will always be present
 #define cumulative groupings
-Time <- 0
-OFFullStripe <- as.data.frame(Time)
-QuadFullStripe <- as.data.frame(Time)
-FreezeFullStripe <- as.data.frame(Time)
-OFFullCumulative <- as.data.frame(Time)
+Time <- 0     #creates blank numeric column to allocate time data to later, reserves first column
+OFFullStripe <- as.data.frame(Time)     #these create series of full-length arrays for data display that cannot be created and named later based on inputs
+QuadFullStripe <- as.data.frame(Time) 
+FreezeFullStripe <- as.data.frame(Time)     
+OFFullCumulative <- as.data.frame(Time)      
 OFFullProportion <- as.data.frame(Time)
 FreezeFullCumulative <- as.data.frame(Time)
 FreezeFullProportion <- as.data.frame(Time)
@@ -32,16 +32,16 @@ LLFullCumulative <- as.data.frame(Time)
 LLFullProportion <- as.data.frame(Time)
 LRFullCumulative <- as.data.frame(Time)
 LRFullProportion <- as.data.frame(Time)
-filelist <- NA
+filelist <- NA    #creates the initial list of files, gets removed later once files uploaded, will not display
 #Time-variable stats
 #Finding quadrant occupancy at each time point
 QuadrantOccupancy <- function(x) {
-  size1 <<- dim(t(x))[1] + 1
+  size1 <<- dim(t(x))[1] + 1    #need this to dynamically add to the array independent of file number
   for (i in 1:as.numeric(dim(x)[1])) {
     if (x[i,2] >= 0) {
       if (x[i,3] >= 0) {
-        x[i,size1] <- "Upper Right"
-        x[i,(size1+1)] <- 1
+        x[i,size1] <- "Upper Right"     #these allow tracking in the time series stripe
+        x[i,(size1+1)] <- 1     #these create a tally that allows tracking of cumulative sums for each quadrant
         x[i,(size1+2)] <- 0
         x[i,(size1+3)] <- 0
         x[i,(size1+4)] <- 0
