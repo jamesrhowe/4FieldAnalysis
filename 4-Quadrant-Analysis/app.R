@@ -1,8 +1,8 @@
 #initialize
 rm(list = ls())
-library(shiny)
-library(evaluate)
-source("analysisfunctions.R")
+library(shiny)    # used for implementation of GUI functionality
+library(evaluate)     # for debugging
+source("analysisfunctions.R")     # contains all the analytic functions and graphics calls
 ui <- navbarPage("4-Quadrant Explorer",
   #control panel
   tabPanel("Upload",
@@ -11,7 +11,6 @@ ui <- navbarPage("4-Quadrant Explorer",
       h3("Data Control Panel"),
       fileInput("upload", "Raw file upload", multiple = TRUE, buttonLabel = "Select"),
       actionButton("analyze", "Analyze"),
-      actionButton("undo", "Undo Last"),
       actionButton("reset", "Reset"),
       textInput("baselineID", h4("Baseline Condition"), value = "Baseline"),
       textInput("treatmentID", h4("Treatment Applied"), value = "Baseline"),
@@ -134,7 +133,7 @@ ui <- navbarPage("4-Quadrant Explorer",
       )
     )
   ),
-  tags$script("$(document).on('shiny:connected', function(event) {
+  tags$script("$(document).on('shiny:connected', function(event) {    # this is needed to match the size of the downloaded graph with the size of the graph being displayed
 var myWidth = $(window).width();
               Shiny.onInputChange('shiny_width',myWidth)
               
@@ -147,19 +146,19 @@ var myWidth = $(window).width();
               });")
 )
 server <- function(input, output, session) {
-   output$summarytable <- renderTable(show_summary(), na = "--")
-   output$resultstable <- renderTable(analyze_data(), na = "--")
+   output$summarytable <- renderTable(show_summary(), na = "--")    # displays the summary table, and changes NA values to something more aesthetically pleasing
+   output$resultstable <- renderTable(analyze_data(), na = "--")    # displays the results summary table, and then changes the NA values as well
    updateplot <- reactive(input$analyze)
-   #display stripe plots
+   # display stripe plots
    output$plottedpath <- renderPlot(PlotPath(get(input$selectedfile1)), 
-                                    width = 720, height = 720, res = 72)
-   output$quadstripeind <- renderPlot(IndStripePlot(get(input$selectedfile1), 8, c("blue4", "red", "blue", "cornflowerblue")), 
-                                    width = 720, height = 60, res = 72)
+                                    width = 720, height = 720, res = 72)    # locks dimensions to optimal resolution and to their most representative dimensions
+   output$quadstripeind <- renderPlot(IndStripePlot(get(input$selectedfile1), 8, c("blue4", "red", "blue", "cornflowerblue")),
+                                    width = 720, height = 60, res = 72)     # locks dimensions to match the velocity plot
    output$ofstripeind <- renderPlot(IndStripePlot(get(input$selectedfile1), 17, c("grey", "purple4")), 
                                       width = 720, height = 60, res = 72)
    output$velplotind <- renderPlot(VelocityPlot(get(input$selectedfile1)), 
-                                    width = 720, height = 180, res = 72)
-   #display graphs
+                                    width = 720, height = 180, res = 72)    # gives a defined length to align the stripes to, allowing correspondence between different plots based on mutual information
+   # display graphs
    output$PIPlot <- renderPlot({
      updateplot()
      PerfInd(results)})
@@ -168,7 +167,7 @@ server <- function(input, output, session) {
      OFFComp(results2, 8, label = "Time Immobile (%)")})
    output$OFPlot <- renderPlot({
      updateplot()
-     OFFComp(results2, 9, label = "Time in Center (%)")})
+     OFFComp(results2, 9, label = "Center Occupancy (%)")})
    output$QuadPlot <- renderPlot({
      updateplot()
      QuadComp(results2)})
@@ -214,7 +213,7 @@ server <- function(input, output, session) {
      updateplot()
      GroupStripe(input$conditionIDfreeze, "Freeze", c("red", "white"))
    }, width = 720, height = 240, res = 72)
-   #display stats
+   # display stats
    output$QuadAnalysis <- renderPrint({
      updateplot()
      if (input$quadrant == "Lower Right") {
@@ -356,7 +355,7 @@ server <- function(input, output, session) {
        paste0("OpenFieldPlot_", Sys.Date(), ".png")
      },
      content = function(file) {
-       image <- OFComp(results2)
+       image <- OFFComp(results2, 9, label = "Center Occupancy (%)")
        png(file, height = 1667, width = (input$shiny_width * 4.16667), res = 300, bg = "transparent")
        print(image)
        dev.off()
@@ -367,7 +366,7 @@ server <- function(input, output, session) {
        paste0("FreezingPlot_", Sys.Date(), ".png")
      },
      content = function(file) {
-       image <- FreezeComp(results2)
+       image <- OFFComp(results2, 8, label = "Time Immobile (%)")
        png(file, height = 1667, width = (input$shiny_width * 4.16667), res = 300, bg = "transparent")
        print(image)
        dev.off()
@@ -543,7 +542,7 @@ server <- function(input, output, session) {
        write(statout, file)
      }
    )
-   #transform data
+   # transform data
    show_summary <- eventReactive(input$analyze, {
       file <- input$upload
       namedfile <<- file$name
@@ -556,10 +555,10 @@ server <- function(input, output, session) {
    })
    analyze_data <- eventReactive(input$analyze, {
      withProgress(message = "Uploading data", detail = "Reading settings...", expr = {
-      #run initial analysis on whole data file
+      # run initial analysis on whole data file
       file <- input$upload
       analyzed <<- read.table(file$datapath)
-      namedfile <<- file$name
+      namedfile <<- file$name     # needed to output the name of the file into the individual file selector menu
       baseline_period <<- input$baselinePeriod
       treatment_period <<- input$treatmentPeriod
       setProgress(value = .3, message = "Analyzing time series data", detail = "Calculating velocity and freezing...")
@@ -570,7 +569,7 @@ server <- function(input, output, session) {
       OpenField(analyzed)
       setProgress(value = .7, message = "Analyzing time series data", detail = "Separating into baseline and treatment groups...")
       #place full analysis into collated bins
-      OFFullStripe <<- cbind.data.frame(OFFullStripe, analyzed[,17])
+      OFFullStripe <<- cbind.data.frame(OFFullStripe, analyzed[,17])    # unwieldy, but all these required because there is no full period that can be taken similar to how baseline and treatment can
       QuadFullStripe <<- cbind.data.frame(QuadFullStripe, analyzed[,8])
       FreezeFullStripe <<- cbind.data.frame(FreezeFullStripe, analyzed[,5])
       OFFullCumulative <<- cbind.data.frame(OFFullCumulative, analyzed[,18])
@@ -585,7 +584,7 @@ server <- function(input, output, session) {
       LLFullProportion <<- cbind.data.frame(LLFullProportion, analyzed[,16])
       LRFullCumulative <<- cbind.data.frame(LRFullCumulative, analyzed[,10])
       LRFullProportion <<- cbind.data.frame(LRFullProportion, analyzed[,14])
-      #divide into baseline and treatments
+      # divide into baseline and treatments
       baseline_data <- analyzed[((min(baseline_period)*240)+1):((max(baseline_period)*240)+1),]
       colnames(baseline_data)[1:3] <- c("Time", "XCoordinate", "YCoordinate")
       treatment_data <- analyzed[((min(treatment_period)*240)+1):((max(treatment_period)*240)+1),]
@@ -604,7 +603,7 @@ server <- function(input, output, session) {
       PerformanceIndex(treatment_data, input$treatmentID)
       results2[size1,] <<- c(results[size1,1:9], input$treatmentID, "Treatment")
       setProgress(value = .9, message = "Analyzing collated data", detail = "Normalizing treatment time series...")
-      for (i in 2:as.numeric(dim(treatment_data)[1])) {
+      for (i in 2:as.numeric(dim(treatment_data)[1])) {     # required to normalize each cumulative measure back to zero after having a total sum from earlier time points
         treatment_data[i,1] <- (treatment_data[i,1] - treatment_data[1,1])
         treatment_data[i,6] <- (treatment_data[i,6] - treatment_data[1,6])
         treatment_data[i,7] <- treatment_data[i,6] / i
@@ -613,7 +612,7 @@ server <- function(input, output, session) {
         treatment_data[i,18] <- (treatment_data[i,18] - treatment_data[1,18])
         treatment_data[i,19] <- treatment_data[i,18] / i
       }
-      treatment_data[1,1] <- 0
+      treatment_data[1,1] <- 0    # needed to set starting values to zero afterwards, instead of leaving starting values intact
       treatment_data[1,6:7] <- 0
       treatment_data[1,9:16] <- 0
       treatment_data[1,18:19] <- 0
@@ -622,7 +621,7 @@ server <- function(input, output, session) {
       return(results)
      })
    })
-   observeEvent(analyze_data(), {
+   observeEvent(analyze_data(), {     # makes the selection menus update after each new upload
      updateSelectInput(session, "selectedfile1", label = "Choose trial", choices = filelist)
      updateSelectInput(session, "selectedfile2", label = "Choose analysis file", choices = filelist)
      updateSelectInput(session, "conditionIDOF", label = "Choose time series condition", choices = conditionlist)

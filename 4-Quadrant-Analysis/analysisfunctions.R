@@ -1,23 +1,23 @@
-#import dependencies
-rm(list = ls())     #reset the environment, remove all old values
-library(ggplot2)    #library for plotting
-library(reshape2)     #needed for melting data into long format
-library(dplyr)    #needed for grouping data by nested subgroups using %>%
-library(nlme)     #needed for making mixed linear models
-library(car)    #needed for good anova function that can take a mixed linear model
-library(multcomp)     #needed for doing multiple comparisons for the mixed two-factor ANOVA
-library(scales)     #contains pretty_breaks() which allows for publication-quality x axes
-#defining functions for analysis
-results <- as.data.frame(matrix(NA, nrow = 1, ncol = 9))    #creates empty matrix for displaying summary results on first page
-results2 <- as.data.frame(matrix(NA, nrow = 1, ncol = 11))    #creates empty matrix for storing extended results for manipulation and export
+# import dependencies
+rm(list = ls())     # reset the environment and remove all old values, ensures all old files are cleared when analyzing new ones
+library(ggplot2)    # library for plotting
+library(reshape2)     # needed for melting data into long format
+library(dplyr)    # needed for grouping data by nested subgroups using %>%
+library(nlme)     # needed for making mixed linear models
+library(car)    # needed for good anova function that can take a mixed linear model
+library(multcomp)     # needed for doing multiple comparisons for the mixed two-factor ANOVA
+library(scales)     # contains pretty_breaks() which allows for publication-quality x axes
+# defining functions for analysis
+results <- as.data.frame(matrix(NA, nrow = 1, ncol = 9))    # creates empty matrix for displaying summary results on first page
+results2 <- as.data.frame(matrix(NA, nrow = 1, ncol = 11))    # creates empty matrix for storing extended results for manipulation and export
 colnames(results) <- c("Filename","Condition", "Lower Left", "Lower Right", "Upper Left", "Upper Right", "Performance Index", "Freezing", "Open Field")     
 colnames(results2) <- c("Filename","Condition", "Lower Left", "Lower Right", "Upper Left", "Upper Right", "Performance Index", "Freezing", "Open Field", "Group", "Sequence")
 summarized <- as.data.frame(matrix(NA, nrow = 1, ncol = 6))     #creates empty matrix for displaying metadata on first page
 colnames(summarized) <- c("Filename", "Treatment", "Baseline On", "Baseline Off", "Treatment On", "Treatment Off")
-conditionlist <- "Full"     #creates list of conditions, enters "Full" as first input, because there is no input to define the condition and it will always be present
+conditionlist <- "Full"     # creates list of conditions, enters "Full" as first input, because there is no input to define the condition and it will always be present
 #define cumulative groupings
-Time <- 0     #creates blank numeric column to allocate time data to later, reserves first column
-OFFullStripe <- as.data.frame(Time)     #these create series of full-length arrays for data display that cannot be created and named later based on inputs
+Time <- 0     # creates blank numeric column to allocate time data to later, reserves first column
+OFFullStripe <- as.data.frame(Time)     # these create series of full-length arrays for data display that cannot be created and named later based on inputs
 QuadFullStripe <- as.data.frame(Time) 
 FreezeFullStripe <- as.data.frame(Time)     
 OFFullCumulative <- as.data.frame(Time)      
@@ -32,16 +32,16 @@ LLFullCumulative <- as.data.frame(Time)
 LLFullProportion <- as.data.frame(Time)
 LRFullCumulative <- as.data.frame(Time)
 LRFullProportion <- as.data.frame(Time)
-filelist <- NA    #creates the initial list of files, gets removed later once files uploaded, will not display
-#Time-variable stats
-#Finding quadrant occupancy at each time point
+filelist <- NA    # creates the initial list of files, gets removed later once files uploaded, will not display
+# Time-variable stats
+# Finding quadrant occupancy at each time point
 QuadrantOccupancy <- function(x) {
-  size1 <<- dim(t(x))[1] + 1    #need this to dynamically add to the array independent of file number
+  size1 <<- dim(t(x))[1] + 1    # need this to dynamically add to the array independent of file number
   for (i in 1:as.numeric(dim(x)[1])) {
     if (x[i,2] >= 0) {
       if (x[i,3] >= 0) {
-        x[i,size1] <- "Upper Right"     #these allow tracking in the time series stripe
-        x[i,(size1+1)] <- 1     #these create a tally that allows tracking of cumulative sums for each quadrant
+        x[i,size1] <- "Upper Right"     # these allow tracking in the time series stripe
+        x[i,(size1+1)] <- 1     # these create a tally that allows tracking of cumulative sums for each quadrant
         x[i,(size1+2)] <- 0
         x[i,(size1+3)] <- 0
         x[i,(size1+4)] <- 0
@@ -72,7 +72,7 @@ QuadrantOccupancy <- function(x) {
   }
   x[,(size1+5):(size1+8)] <- c(cumsum(x[,(size1+1)]), cumsum(x[,(size1+2)]), cumsum(x[,(size1+3)]), cumsum(x[,(size1+4)]))
   x[,(size1+9):(size1+12)] <- c(cummean(x[,(size1+1)]), cummean(x[,(size1+2)]), cummean(x[,(size1+3)]), cummean(x[,(size1+4)]))
-  x <- x[,-(size1+1)]
+  x <- x[,-(size1+1)]     # removes the running tally from the results sheet, do not want it to display due to redundancy
   x <- x[,-(size1+1)]
   x <- x[,-(size1+1)]
   x <- x[,-(size1+1)]
@@ -84,7 +84,7 @@ QuadrantOccupancy <- function(x) {
 #Finding velocity and freezing at each time point
 Velocity <- function(x) {
   size1 <<- dim(t(x))[1] + 1
-  size2 <<- dim(t(x))[1] + 2
+  size2 <<- dim(t(x))[1] + 2    # this one is required to simultaneously post whether or not it is freezing, along with velocity
   for (i in 1:as.numeric(dim(x)[1])) {
     if (i == 1) {
       x[i,size1] <- 0
@@ -150,11 +150,11 @@ OpenField <- function(x) {
   assign(namedfile, x, .GlobalEnv)
   analyzed <<- x
 }
-#Summary stats
-#Quadrant occupancy tallies and performance index calculation
+# Summary stats
+# Quadrant occupancy tallies and performance index calculation
 PerformanceIndex <- function(x, condition) {
   if (exists(paste0("UL",condition,"Cumulative")) == FALSE) {
-    assign(paste0("UL",condition,"Cumulative"), as.data.frame(Time), .GlobalEnv)
+    assign(paste0("UL",condition,"Cumulative"), as.data.frame(Time), .GlobalEnv)    # this is pretty unwieldy, but it is required for grouped estimates of quadrant occupancy for each one
     assign(paste0("UL",condition,"Proportion"), as.data.frame(Time), .GlobalEnv)
     assign(paste0("LL",condition,"Cumulative"), as.data.frame(Time), .GlobalEnv)
     assign(paste0("LL",condition,"Proportion"), as.data.frame(Time), .GlobalEnv)
@@ -164,10 +164,10 @@ PerformanceIndex <- function(x, condition) {
     assign(paste0("UR",condition,"Proportion"), as.data.frame(Time), .GlobalEnv)
     assign(paste0("Quad",condition,"Stripe"), as.data.frame(Time), .GlobalEnv)
   }
-  if (condition %in% conditionlist == FALSE) {
+  if (condition %in% conditionlist == FALSE) {    # used to identify if the condition here is new and adds non-redundantly to the list of conditions
     conditionlist <<- c(conditionlist, condition)
   }
-  ulcum <- get(paste0("UL",condition,"Cumulative"))
+  ulcum <- get(paste0("UL",condition,"Cumulative"))     # needed to find the condition of interest and analyze it
   ulprop <- get(paste0("UL",condition,"Proportion"))
   urcum <- get(paste0("UR",condition,"Cumulative"))
   urprop <- get(paste0("UR",condition,"Proportion"))
@@ -176,7 +176,7 @@ PerformanceIndex <- function(x, condition) {
   lrcum <- get(paste0("LR",condition,"Cumulative"))
   lrprop <- get(paste0("LR",condition,"Proportion"))
   stripe <- get(paste0("Quad",condition,"Stripe"))
-  ulcum <- cbind.data.frame(get(paste0("UL",condition,"Cumulative")), x$`Upper Left Sum`)
+  ulcum <- cbind.data.frame(get(paste0("UL",condition,"Cumulative")), x$`Upper Left Sum`)     # needed to iteratively add new data to the group based on its condition
   ulprop <- cbind.data.frame(get(paste0("UL",condition,"Proportion")), x$`Upper Left Mean`)
   urcum <- cbind.data.frame(get(paste0("UR",condition,"Cumulative")), x$`Upper Right Sum`)
   urprop <- cbind.data.frame(get(paste0("UR",condition,"Proportion")), x$`Upper Right Mean`)
@@ -185,9 +185,9 @@ PerformanceIndex <- function(x, condition) {
   lrcum <- cbind.data.frame(get(paste0("LR",condition,"Cumulative")), x$`Lower Right Sum`)
   lrprop <- cbind.data.frame(get(paste0("LR",condition,"Proportion")), x$`Lower Right Mean`)
   stripe <- cbind.data.frame(get(paste0("Quad",condition,"Stripe")), x$`Quadrant`)
-  name <- as.numeric(dim(t(get(paste0("Quad",condition,"Stripe"))))[1])
+  name <- as.numeric(dim(t(get(paste0("Quad",condition,"Stripe"))))[1])     # this is required to make the stripe count by mouse and stack atop each other
   colnames(stripe)[name] <- name - 1
-  assign(paste0("UL",condition,"Cumulative"), ulcum, .GlobalEnv)
+  assign(paste0("UL",condition,"Cumulative"), ulcum, .GlobalEnv)    # replaces the old version of the file with the new one containing the most recent data
   assign(paste0("UL",condition,"Proportion"), ulprop, .GlobalEnv)
   assign(paste0("LL",condition,"Cumulative"), llcum, .GlobalEnv)
   assign(paste0("LL",condition,"Proportion"), llprop, .GlobalEnv)
@@ -200,15 +200,15 @@ PerformanceIndex <- function(x, condition) {
   tally <- as.data.frame(table(x$Quadrant))
   results[size1,1] <<- namedfile
   results[size1,2] <<- condition
-  results[size1,3] <<- tally[1,2] / sum(tally[,2])
+  results[size1,3] <<- tally[1,2] / sum(tally[,2])    # finds average proportion of time spent in this state as a fraction of time
   results[size1,4] <<- tally[2,2] / sum(tally[,2])
   results[size1,5] <<- tally[3,2] / sum(tally[,2])
   results[size1,6] <<- tally[4,2] / sum(tally[,2])
-  results[size1,7] <<- ((results[size1,4] * 100) - 25) / 0.25
+  results[size1,7] <<- ((results[size1,4] * 100) - 25) / 0.25     # calculates the performance index based on lower right occupancy calculation
 }
-#Center Occupancy and Freezing
+# Center Occupancy and Freezing
 COF <- function(x, condition, label, coln, sumcol, meancol, resultcol, wantedval, unwantedval) {
-  if (exists(paste0(label,condition,"Cumulative")) == FALSE) {
+  if (exists(paste0(label,condition,"Cumulative")) == FALSE) {    # needed to identify condition of interest
     assign(paste0(label,condition,"Cumulative"), as.data.frame(Time), .GlobalEnv)
     assign(paste0(label,condition,"Proportion"), as.data.frame(Time), .GlobalEnv)
     assign(paste0(label,condition,"Stripe"), as.data.frame(Time), .GlobalEnv)
@@ -216,12 +216,12 @@ COF <- function(x, condition, label, coln, sumcol, meancol, resultcol, wantedval
   if (condition %in% conditionlist == FALSE) {
     conditionlist <<- c(conditionlist, condition)
   }
-  cum <- get(paste0(label,condition,"Cumulative"))
+  cum <- get(paste0(label,condition,"Cumulative"))    # uses the condition and label to identify the exact type of measure and the conditions of interest 
   prop <- get(paste0(label,condition,"Proportion"))
   stripe <- get(paste0(label,condition,"Stripe"))
   cum <- cbind.data.frame(get(paste0(label,condition,"Cumulative")), x[,sumcol])
   prop <- cbind.data.frame(get(paste0(label,condition,"Proportion")), x[,meancol])
-  x[,coln] <- gsub(wantedval, 1, x[,coln])
+  x[,coln] <- gsub(wantedval, 1, x[,coln])    # finds the column with the data needed, then takes it and places into a new column for transformation and analysis
   x[,coln] <- gsub(unwantedval, 2, x[,coln])
   stripe <- cbind.data.frame(get(paste0(label,condition,"Stripe")), x[,coln])
   assign(paste0(label,condition,"Cumulative"), cum, .GlobalEnv)
@@ -231,9 +231,9 @@ COF <- function(x, condition, label, coln, sumcol, meancol, resultcol, wantedval
   tally <- as.data.frame(table(x[,coln]))
   results[size1,resultcol] <<- tally[1,2] / sum(tally[,2])
 }
-#Creating plots for these
-#Single plots
-#Path plot
+# Creating plots for these
+# Single plots
+# Path plot
 PlotPath <- function(x) {
   ggplot(x, aes(x = XCoordinate, y = YCoordinate)) + geom_rect(aes(xmin = 0, xmax = Inf, ymin = -Inf, ymax = 0), fill = "lightcoral", alpha = 0.03) +
     geom_rect(aes(xmin = -13, xmax = 13, ymin = -13, ymax = 13), fill = "grey", alpha = 0.01) +
@@ -254,10 +254,8 @@ IndStripePlot <- function(x, coln, colorlist) {
 #Velocity and freezing plot
 VelocityPlot <- function(x) {
   x$Time <- (x$Time / 60)
-  ggplot(x, aes(Time, Velocity)) + geom_path() +
-  geom_segment(xend = max(x$Time), y = max(x$Velocity) + 1, 
-               yend = max(x$Velocity) + 1, aes(colour = x$Velocity < 1)) +
-  scale_colour_manual(values = c('white', 'red')) + scale_y_continuous(expand = c(0,1.1)) + scale_x_continuous(expand = c(0,0), breaks = pretty_breaks()) +
+  ggplot(x, aes(Time, Velocity)) + geom_segment(x = x$Time, xend = x$Time, y = 0, yend = max(x$Velocity), aes(colour = x$Freezing)) + geom_path() + 
+  scale_colour_manual(values = c('lightcoral', 'white')) + scale_y_continuous(expand = c(0,0)) + scale_x_continuous(expand = c(0,0), breaks = pretty_breaks()) +
   theme(legend.position="none", panel.background = element_blank(), panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
         axis.line = element_line(colour = "black")) + xlab("Time (min)") + ylab("Velocity (cm/s)")
 }
@@ -276,10 +274,11 @@ PerfInd <- function(x) {
           axis.title.y = element_text(size=20), axis.text.y = element_text(size=15), axis.text.x = element_text(size=20), 
           legend.key = element_rect(fill = NA, color = NA), legend.direction = "horizontal")
   }
-#Freezing and Open Field Comparisons
+# Freezing and Open Field Comparisons
 OFFComp <- function(x, coln, label) {
   x2 <- na.omit(x)
   colnames(x2)[coln] <- "type"
+  x2$type <- x2$type * 100
   summary <- x2 %>%
     group_by(Group, Condition) %>%
     summarize(sem = sd(type)/sqrt(n()), type = mean(type))
@@ -292,26 +291,27 @@ OFFComp <- function(x, coln, label) {
           axis.title.y = element_text(size=20), axis.text.y = element_text(size=15), axis.text.x = element_text(size=20), strip.background = element_blank(),
           legend.key = element_rect(fill = NA, color = NA), legend.direction = "horizontal", strip.text.x = element_blank()) + facet_wrap(~ Group, scales="free")
 }
-#Quadrant Occupancy
+# Quadrant Occupancy
 QuadComp <- function(x) {
   x2 <- na.omit(x)
   x2 <- x2[,1:6]
   x2 <- melt(x2)
   colnames(x2) <- c("Filename", "Condition", "Quadrant", "QTime") 
   number <- as.numeric(dim(as.data.frame(table(x2$Condition)))[1]) - 1
+  x2$QTime <- x2$QTime * 100
   Q_summary <- x2 %>%
     group_by(Condition, Quadrant) %>%
     summarize(sem = sd(QTime)/sqrt(n()), QTime = mean(QTime))
   ggplot(x2, aes(Quadrant, QTime, group = Condition)) +  geom_col(aes(colour = Condition), data = Q_summary, fill = NA, position = position_dodge(width=0.9), na.rm = TRUE, show.legend = FALSE) + 
     geom_errorbar(aes(ymin = QTime - sem, ymax = QTime + sem), data = Q_summary, width = .5, position = position_dodge(width = 0.9)) + scale_colour_manual(values = c("grey", "red", "blue", "forestgreen", "purple4", "darkorange")) + 
-    ylab("Time in Quadrant (%)") + geom_point(aes(colour = Condition), na.rm = TRUE, size = 3, position= position_jitterdodge(dodge.width=0.9, jitter.width = .1)) + scale_y_continuous(expand = c(0,0), limits = c(0, max(x2$QTime)*1.1)) +
+    ylab("Quadrant Occupancy (%)") + geom_point(aes(colour = Condition), na.rm = TRUE, size = 3, position= position_jitterdodge(dodge.width=0.9, jitter.width = .1)) + scale_y_continuous(expand = c(0,0), limits = c(0, max(x2$QTime)*1.1)) +
     theme(legend.position="top", axis.title.x = element_blank(), panel.background = element_blank(), panel.grid.major = element_blank(), 
           panel.grid.minor = element_blank(), axis.line = element_line(colour = "black"), legend.text=element_text(size=20), legend.title=element_blank(),
           axis.title.y = element_text(size=20), axis.text.y = element_text(size=15), axis.text.x = element_text(size=20), 
           legend.key = element_rect(fill = NA, color = NA), legend.direction = "horizontal")
 }
-#CDF functions
-#Individual CDFs in summary info
+# CDF functions
+# Individual CDFs in summary info
 IndCDF <- function(x, format, infotype) {
   if (format == 1) {
     if (infotype == "Quadrant Occupancy") {
@@ -322,24 +322,27 @@ IndCDF <- function(x, format, infotype) {
       x <- melt(x)
       x <- cbind.data.frame(timex, x)
       colnames(x) <- c("Time", "Quadrant", "value")
+      x$value <- x$value * 100
       ggplot(x, aes(Time, value, colour = Quadrant)) + geom_line() + scale_colour_manual(values = c("cornflowerblue", "red", "blue", "blue4")) +
-        scale_y_continuous(expand = c(0,0)) + scale_x_continuous(expand = c(0,0)) +
+        scale_y_continuous(expand = c(0,0)) + scale_x_continuous(expand = c(0,0), breaks = pretty_breaks()) +
         theme(legend.position="top", panel.background = element_blank(), panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
-              axis.line = element_line(colour = "black"), legend.key = element_rect(fill = NA, color = NA)) + xlab("Time (s)") + ylab("Mean Quadrant Occupancy (%)")
+              axis.line = element_line(colour = "black"), legend.key = element_rect(fill = NA, color = NA)) + xlab("Time (min)") + ylab("Quadrant Occupancy (%)")
     }
     else {
       x$Time <- (x$Time / 60)
       if (infotype == "Freezing") {
+        x$`Freezing Mean` <- x$`Freezing Mean` * 100
         ggplot(x, aes(Time, `Freezing Mean`)) + geom_line() +
-          scale_y_continuous(expand = c(0,0)) + scale_x_continuous(expand = c(0,0)) +
+          scale_y_continuous(expand = c(0,0)) + scale_x_continuous(expand = c(0,0), breaks = pretty_breaks()) +
           theme(legend.position="none", panel.background = element_blank(), panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
-            axis.line = element_line(colour = "black")) + xlab("Time (min)") + ylab("Mean Time Immobile (%)")
+            axis.line = element_line(colour = "black")) + xlab("Time (min)") + ylab("Time Immobile (%)")
       }
       else {
+        x$`OpenField Mean` <- x$`OpenField Mean` * 100
         ggplot(x, aes(Time, `OpenField Mean`)) + geom_line() +
-          scale_y_continuous(expand = c(0,0)) + scale_x_continuous(expand = c(0,0)) +
+          scale_y_continuous(expand = c(0,0)) + scale_x_continuous(expand = c(0,0), breaks = pretty_breaks()) +
           theme(legend.position="none", panel.background = element_blank(), panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
-                axis.line = element_line(colour = "black")) + xlab("Time (min)") + ylab("Mean Center Occupancy (%)")
+                axis.line = element_line(colour = "black")) + xlab("Time (min)") + ylab("Center Occupancy (%)")
       }
     }
   }
@@ -352,70 +355,73 @@ IndCDF <- function(x, format, infotype) {
       x <- melt(x)
       x <- cbind.data.frame(timex, x)
       colnames(x) <- c("Time", "Quadrant", "value")
+      x$value <- x$value / 4
       ggplot(x, aes(Time, value, colour = Quadrant)) + geom_line() + scale_colour_manual(values = c("cornflowerblue", "red", "blue", "blue4")) +
-        scale_y_continuous(expand = c(0,0)) + scale_x_continuous(expand = c(0,0)) +
+        scale_y_continuous(expand = c(0,0)) + scale_x_continuous(expand = c(0,0), breaks = pretty_breaks()) +
         theme(legend.position="top", panel.background = element_blank(), panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
-              axis.line = element_line(colour = "black"), legend.key = element_rect(fill = NA, color = NA)) + xlab("Time (min)") + ylab("Cumulative Quadrant Occupancy (Frames)")
+              axis.line = element_line(colour = "black"), legend.key = element_rect(fill = NA, color = NA)) + xlab("Time (min)") + ylab("Cumulative Quadrant Occupancy (sec)")
     }
     else {
       x$Time <- (x$Time / 60)
       if (infotype == "Freezing") {
+        x$`Freezing Sum` <- x$`Freezing Sum` / 4
         ggplot(x, aes(Time, `Freezing Sum`)) + geom_line() +
-          scale_y_continuous(expand = c(0,0)) + scale_x_continuous(expand = c(0,0)) +
+          scale_y_continuous(expand = c(0,0)) + scale_x_continuous(expand = c(0,0), breaks = pretty_breaks()) +
           theme(legend.position="none", panel.background = element_blank(), panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
-                axis.line = element_line(colour = "black")) + xlab("Time (min)") + ylab("Cumulative Time Immobile (Frames)")
+                axis.line = element_line(colour = "black")) + xlab("Time (min)") + ylab("Cumulative Time Immobile (sec)")
       }
       else {
+        x$`OpenField Sum` <- x$`OpenField Sum` / 4
         ggplot(x, aes(Time, `OpenField Sum`)) + geom_line() +
-          scale_y_continuous(expand = c(0,0)) + scale_x_continuous(expand = c(0,0)) +
+          scale_y_continuous(expand = c(0,0)) + scale_x_continuous(expand = c(0,0), breaks = pretty_breaks()) +
           theme(legend.position="none", panel.background = element_blank(), panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
-                axis.line = element_line(colour = "black")) + xlab("Time (min)") + ylab("Cumulative Center Occupancy (Frames)")
+                axis.line = element_line(colour = "black")) + xlab("Time (min)") + ylab("Cumulative Center Occupancy (sec)")
       }
     }
   }
 }
-#Freezing CDF
+# Freezing CDF
 GroupCDF <- function(condition, label, type) {
   if (type == 1) {
     x <- data.frame(get(paste0(label,condition,"Proportion")), stringsAsFactors = FALSE)
     if (label == "Freeze") {
-      axislab <<- "Mean Time Immobile (%)"
+      axislab <<- "Time Immobile (%)"
     }
     if (label == "LR") {
-      axislab <<- "Mean Lower Right Occupancy (%)"
+      axislab <<- "Lower Right Occupancy (%)"
     }
     if (label == "UR") {
-      axislab <<- "Mean Upper Right Occupancy (%)"
+      axislab <<- "Upper Right Occupancy (%)"
     }
     if (label == "LL") {
-      axislab <<- "Mean Lower Left Occupancy (%)"
+      axislab <<- "Lower Left Occupancy (%)"
     }
     if (label == "UL") {
-      axislab <<- "Mean Upper Left Occupancy (%)"
+      axislab <<- "Upper Left Occupancy (%)"
     }
     else {
-      axislab <<- "Mean Center Occupancy (%)"
+      axislab <<- "Center Occupancy (%)"
     }
   }
   else {
     x <- data.frame(get(paste0(label,condition,"Cumulative")), stringsAsFactors = FALSE)
     if (label == "Freeze") {
-      axislab <<- "Cumulative Time Immobile (Frames)"
+      axislab <<- "Cumulative Time Immobile (sec)"
     }
     if (label == "LR") {
-      axislab <<- "Cumulative Lower Right Occupancy (Frames)"
+      axislab <<- "Cumulative Lower Right Occupancy (sec)"
     }
     if (label == "UR") {
-      axislab <<- "Cumulative Upper Right Occupancy (Frames)"
+      axislab <<- "Cumulative Upper Right Occupancy (sec)"
     }
     if (label == "LL") {
-      axislab <<- "Cumulative Lower Left Occupancy (Frames)"
+      axislab <<- "Cumulative Lower Left Occupancy (sec)"
     }
     if (label == "UL") {
-      axislab <<- "Cumulative Upper Left Occupancy (Frames)"
+      axislab <<- "Cumulative Upper Left Occupancy (sec)"
     }
     else {
-      axislab <<- "Cumulative Center Occupancy (Frames)"
+      axislab <<- "Cumulative Center Occupancy (sec)"
     }
   }
   colnames(x) <- 0:as.numeric(dim(t(x))[1] - 1)
@@ -433,7 +439,7 @@ GroupCDF <- function(condition, label, type) {
     theme(legend.position="none", panel.background = element_blank(), panel.grid.major = element_blank(), 
           panel.grid.minor = element_blank(), axis.line = element_line(colour = "black"))
 }
-#Combined stripes
+# Combined stripes
 GroupStripe <- function(condition, type, colorlist) {
   x <- data.frame(get(paste0(type,condition,"Stripe")), stringsAsFactors = FALSE)
   colnames(x) <- 0:as.numeric(dim(t(x))[1] - 1)
@@ -450,12 +456,12 @@ GroupStripe <- function(condition, type, colorlist) {
           axis.line = element_line(colour = "black"), axis.text.y = element_text(size=10), axis.text.x = element_text(size=10))
   
 }
-#ANOVA
+# ANOVA
 MEANOVA <- function(x, coln) {
   anovamat <<- na.omit(x)
-  anovamat <<- data.frame(anovamat[,1], anovamat[,10], anovamat[,11], anovamat[,coln])
+  anovamat <<- data.frame(anovamat[,1], anovamat[,10], anovamat[,11], anovamat[,coln])    # needed to import metadata into the ANOVA and paired t-tests along with the metric of interest
   colnames(anovamat) <<- c("Filename", "Group", "Sequence", "Response")
-  anovamat <<- melt(anovamat)
+  anovamat <<- melt(anovamat)     # data needs to be in long format to work properly in the lme() and aov() functions
   anovamat <<- anovamat[,-4]
   if (nlevels(anovamat$Group) == 2) {
     return(t.test(value ~ Sequence, data = anovamat, paired = TRUE, conf.level = .95))
