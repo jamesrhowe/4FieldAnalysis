@@ -11,14 +11,13 @@ ui <- navbarPage("4-Quadrant Explorer",
       h3("Data Control Panel"),
       fileInput("upload", "Raw file upload", multiple = TRUE, buttonLabel = "Select"),
       actionButton("analyze", "Analyze"),
-      actionButton("reset", "Reset"),
+      downloadButton("downloadResults", label = "Download Results"),
       textInput("baselineID", h4("Baseline Condition"), value = "Baseline"),
       textInput("treatmentID", h4("Treatment Applied"), value = "Baseline"),
       sliderInput("baselinePeriod", h5("Baseline Analysis Period (min)"), 
                   min = 0, max = 30, value = c(0,10)),
       sliderInput("treatmentPeriod", h5("Treatment Analysis Period (min)"), 
                   min = 0, max = 30, value = c(12,22)),
-      downloadButton("downloadResults", label = "Download Results Summary"),
       selectInput("selectedfile2", label = "Choose analysis file", choices = filelist),
       downloadButton("downloadIA", label = "Download Individual Analysis")
     ),
@@ -176,20 +175,16 @@ server <- function(input, output, session) {
    output$QuadCDF <- renderPlot({
      updateplot()
      if (input$quadrant == "Lower Right") {
-       quadlabel <<- "LR"
+       quadlabel <- "LR"
      }
-     else {
-       if (input$quadrant == "Lower Left") {
-         quadlabel <<- "LL"
-       }
-       else {
-         if (input$quadrant == "Upper Right") {
-           quadlabel <<- "UR"
-         }
-         else {
-           quadlabel <<- "UL"
-         }
-       }
+     if (input$quadrant == "Lower Left") {
+       quadlabel <- "LL"
+     }
+     if (input$quadrant == "Upper Right") {
+       quadlabel <- "UR"
+     }
+     if (input$quadrant == "Upper Left") {    # need to keep last statement as an if{} instead of else{} to impute correct conditions
+       quadlabel <- "UL"
      }
      GroupCDF(input$conditionIDquad, quadlabel, input$typeoftimequad)
    }, width = 720, height = 400, res = 72)
@@ -219,18 +214,14 @@ server <- function(input, output, session) {
      if (input$quadrant == "Lower Right") {
        quad <- 4
      }
-     else {
-       if (input$quadrant == "Lower Left") {
-         quad <- 3
-       }
-       else {
-         if (input$quadrant == "Upper Right") {
-           quad <- 6
-         }
-         else {
-           quad <- 5
-         }
-       }
+     if (input$quadrant == "Lower Left") {
+       quad <- 3
+     }
+     if (input$quadrant == "Upper Right") {
+       quad <- 6
+     }
+     if (input$quadrant == "Upper Left") {    # need to keep last statement as an if{} instead of else{} statement to impute correct conditions
+       quad <- 5
      }
      MEANOVA(results2, quad)
    })
@@ -443,26 +434,22 @@ server <- function(input, output, session) {
          if (input$infotypeind == "Quadrant Occupancy") {
            paste(input$selectedfile1,"Mean Quadrant Time Series.png")
          }
-         else {
-           if (input$infotypeind == "Freezing") {
-             paste(input$selectedfile1,"Mean Freezing Time Series.png")
-           }
-           else {
-             paste(input$selectedfile1,"Mean Open Field Time Series.png")
-           }
+         if (input$infotypeind == "Freezing") {
+           paste(input$selectedfile1,"Mean Freezing Time Series.png")
+         }
+         if (input$infotypeind == "Center Occupancy") {     # need to keep last statement as an if{} instead of else{} statement to impute correct conditions
+           paste(input$selectedfile1,"Mean Open Field Time Series.png")
          }
        }
        else {
          if (input$infotypeind == "Quadrant Occupancy") {
            paste(input$selectedfile1,"Total Quadrant Time Series.png")
          }
-         else {
-           if (input$infotypeind == "Freezing") {
-             paste(input$selectedfile1,"Total Freezing Time Series.png")
-           }
-           else {
+         if (input$infotypeind == "Freezing") {
+           paste(input$selectedfile1,"Total Freezing Time Series.png")
+         }
+         if (input$infotypeind == "Center Occupancy") {      # need to keep last statement as an if{} instead of else{} statement to impute correct conditions
              paste(input$selectedfile1,"Total Open Field Time Series.png")
-           }
          }
        }
      },
@@ -479,18 +466,14 @@ server <- function(input, output, session) {
        if (input$quadrant == "Lower Right") {
          quadn <- "Lower_Right"
        }
-       else {
-         if (input$quadrant == "Lower Left") {
-           quadn <- "Lower_Left"
-         }
-         else {
-           if (input$quadrant == "Upper Right") {
-             quadn <- "Upper_Right"
-           }
-           else {
-             quadn <- "Upper_Left"
-           }
-         }
+       if (input$quadrant == "Lower Left") {
+         quadn <- "Lower_Left"
+       }
+       if (input$quadrant == "Upper Right") {
+         quadn <- "Upper_Right"
+       }
+       if (input$quadrant == "Upper Left") {    # need to keep last statement as an if{} instead of else{} statement to impute correct conditions
+         quadn <- "Upper_Left"
        }
        paste0("QuadrantStats_",quadn,"_",Sys.Date(),".txt")
      },
@@ -498,18 +481,14 @@ server <- function(input, output, session) {
        if (input$quadrant == "Lower Right") {
          quad <- 4
        }
-       else {
-         if (input$quadrant == "Lower Left") {
-           quad <- 3
-         }
-         else {
-           if (input$quadrant == "Upper Right") {
-             quad <- 6
-           }
-           else {
-             quad <- 5
-           }
-         }
+       if (input$quadrant == "Lower Left") {
+         quad <- 3
+       }
+       if (input$quadrant == "Upper Right") {
+         quad <- 6
+       }
+       if (input$quadrant == "Upper Left") {    # need to keep last statement as an if{} instead of else{} statement to impute correct conditions
+         quad <- 5
        }
        statout <- MEANOVA(results2, quad)
        write(statout, file)
@@ -596,13 +575,8 @@ server <- function(input, output, session) {
       COF(baseline_data, input$baselineID, "Freeze", 5, 6, 7, 8, "Immobile", "Mobile")
       COF(baseline_data, input$baselineID, "OF", 17, 18, 19, 9, "Center", "Surround")
       PerformanceIndex(baseline_data,input$baselineID)
-      results2[size1,] <<- c(results[size1,1:9], input$baselineID, "Baseline")
+      results2[size1,] <<- c(results[size1,1:9], input$treatmentID, "Baseline")
       results <<- rbind.data.frame(results, c(NA, NA, NA, NA, NA, NA, NA))
-      COF(treatment_data, input$treatmentID, "Freeze", 5, 6, 7, 8, "Immobile", "Mobile")
-      COF(treatment_data, input$treatmentID, "OF", 17, 18, 19, 9, "Center", "Surround")
-      PerformanceIndex(treatment_data, input$treatmentID)
-      results2[size1,] <<- c(results[size1,1:9], input$treatmentID, "Treatment")
-      setProgress(value = .9, message = "Analyzing collated data", detail = "Normalizing treatment time series...")
       for (i in 2:as.numeric(dim(treatment_data)[1])) {     # required to normalize each cumulative measure back to zero after having a total sum from earlier time points
         treatment_data[i,1] <- (treatment_data[i,1] - treatment_data[1,1])
         treatment_data[i,6] <- (treatment_data[i,6] - treatment_data[1,6])
@@ -616,6 +590,11 @@ server <- function(input, output, session) {
       treatment_data[1,6:7] <- 0
       treatment_data[1,9:16] <- 0
       treatment_data[1,18:19] <- 0
+      COF(treatment_data, input$treatmentID, "Freeze", 5, 6, 7, 8, "Immobile", "Mobile")
+      COF(treatment_data, input$treatmentID, "OF", 17, 18, 19, 9, "Center", "Surround")
+      PerformanceIndex(treatment_data, input$treatmentID)
+      results2[size1,] <<- c(results[size1,1:9], input$treatmentID, "Treatment")
+      setProgress(value = .9, message = "Analyzing collated data", detail = "Normalizing treatment time series...")
       assign(paste(namedfile,"||",input$treatmentID), treatment_data, .GlobalEnv)
       results <<- rbind.data.frame(results, c(NA, NA, NA, NA, NA, NA, NA))
       return(results)

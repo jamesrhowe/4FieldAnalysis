@@ -167,15 +167,6 @@ PerformanceIndex <- function(x, condition) {
   if (condition %in% conditionlist == FALSE) {    # used to identify if the condition here is new and adds non-redundantly to the list of conditions
     conditionlist <<- c(conditionlist, condition)
   }
-  ulcum <- get(paste0("UL",condition,"Cumulative"))     # needed to find the condition of interest and analyze it
-  ulprop <- get(paste0("UL",condition,"Proportion"))
-  urcum <- get(paste0("UR",condition,"Cumulative"))
-  urprop <- get(paste0("UR",condition,"Proportion"))
-  llcum <- get(paste0("LL",condition,"Cumulative"))
-  llprop <- get(paste0("LL",condition,"Proportion"))
-  lrcum <- get(paste0("LR",condition,"Cumulative"))
-  lrprop <- get(paste0("LR",condition,"Proportion"))
-  stripe <- get(paste0("Quad",condition,"Stripe"))
   ulcum <- cbind.data.frame(get(paste0("UL",condition,"Cumulative")), x$`Upper Left Sum`)     # needed to iteratively add new data to the group based on its condition
   ulprop <- cbind.data.frame(get(paste0("UL",condition,"Proportion")), x$`Upper Left Mean`)
   urcum <- cbind.data.frame(get(paste0("UR",condition,"Cumulative")), x$`Upper Right Sum`)
@@ -385,43 +376,43 @@ GroupCDF <- function(condition, label, type) {
   if (type == 1) {
     x <- data.frame(get(paste0(label,condition,"Proportion")), stringsAsFactors = FALSE)
     if (label == "Freeze") {
-      axislab <<- "Time Immobile (%)"
+      axislab <- "Time Immobile (%)"
     }
     if (label == "LR") {
-      axislab <<- "Lower Right Occupancy (%)"
+      axislab <- "Lower Right Occupancy (%)"
     }
     if (label == "UR") {
-      axislab <<- "Upper Right Occupancy (%)"
+      axislab <- "Upper Right Occupancy (%)"
     }
     if (label == "LL") {
-      axislab <<- "Lower Left Occupancy (%)"
+      axislab <- "Lower Left Occupancy (%)"
     }
     if (label == "UL") {
-      axislab <<- "Upper Left Occupancy (%)"
+      axislab <- "Upper Left Occupancy (%)"
     }
-    else {
-      axislab <<- "Center Occupancy (%)"
+    if (label == "OF") {    # need to keep last statement as an if{} instead of else{} statement to impute correct conditions
+      axislab <- "Center Occupancy (%)"
     }
   }
   else {
     x <- data.frame(get(paste0(label,condition,"Cumulative")), stringsAsFactors = FALSE)
     if (label == "Freeze") {
-      axislab <<- "Cumulative Time Immobile (sec)"
+      axislab <- "Cumulative Time Immobile (sec)"
     }
     if (label == "LR") {
-      axislab <<- "Cumulative Lower Right Occupancy (sec)"
+      axislab <- "Cumulative Lower Right Occupancy (sec)"
     }
     if (label == "UR") {
-      axislab <<- "Cumulative Upper Right Occupancy (sec)"
+      axislab <- "Cumulative Upper Right Occupancy (sec)"
     }
     if (label == "LL") {
-      axislab <<- "Cumulative Lower Left Occupancy (sec)"
+      axislab <- "Cumulative Lower Left Occupancy (sec)"
     }
     if (label == "UL") {
-      axislab <<- "Cumulative Upper Left Occupancy (sec)"
+      axislab <- "Cumulative Upper Left Occupancy (sec)"
     }
-    else {
-      axislab <<- "Cumulative Center Occupancy (sec)"
+    if (label == "OF") {    # need to keep last statement as an if{} instead of else{} statement to impute correct conditions
+      axislab <- "Cumulative Center Occupancy (sec)"
     }
   }
   colnames(x) <- 0:as.numeric(dim(t(x))[1] - 1)
@@ -432,7 +423,9 @@ GroupCDF <- function(condition, label, type) {
   x <- melt(x)
   x[,1] <- rep(seq(from = 0, to = ((dim(x)[1]/length(levels(x[,2]))-1)/240), by = (1/240)), length.out = dim(x)[1])
   x <- cbind.data.frame(x, vec)
-  ggplot(x, aes(`0`, value)) + geom_line(aes(colour = variable)) + geom_line(aes(y = vec), linetype = 2) +
+  x$value <- x$value * 100
+  x$vec <- x$vec * 100
+  ggplot(x, aes(`0`, value)) + stat_summary(geom="ribbon", fun.data=mean_cl_normal, fun.args=list(conf.int=0.95), fill="grey", alpha = .4) + geom_line(aes(colour = variable)) + geom_line(aes(y = vec), linetype = 2) +
     scale_colour_manual(values = c("red", "blue", "forestgreen", "purple4", "darkorange", "cornflowerblue", "indianred", "chartreuse3", "blue4", "maroon", "olivedrab", "darkmagenta", "sandybrown", "seagreen", "lightgreen", "lightcoral", "slategrey", "steelblue")) + 
     xlab("Time (min)") + ylab(axislab) + scale_y_continuous(expand = c(0,0)) + 
     scale_x_continuous(expand = c(0,0), breaks = pretty_breaks()) +
@@ -463,7 +456,7 @@ MEANOVA <- function(x, coln) {
   colnames(anovamat) <<- c("Filename", "Group", "Sequence", "Response")
   anovamat <<- melt(anovamat)     # data needs to be in long format to work properly in the lme() and aov() functions
   anovamat <<- anovamat[,-4]
-  if (nlevels(anovamat$Group) == 2) {
+  if (nlevels(anovamat$Group) == 1) {
     return(t.test(value ~ Sequence, data = anovamat, paired = TRUE, conf.level = .95))
   }
   else {
