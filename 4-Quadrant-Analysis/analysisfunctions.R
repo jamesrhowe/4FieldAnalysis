@@ -88,22 +88,22 @@ Velocity <- function(x) {
   for (i in 1:as.numeric(dim(x)[1])) {
     if (i == 1) {
       x[i,size1] <- 0
-      x[i,size2] <- "Mobile"
-      x[i,(size2+1)] <- 0
+      x[i,size2] <- runif(1, max = .99)     # need to assign random numbers below 1 to ensure the only long strings of repeated numbers are the immobile time points
     }
     else {
       dist <- sqrt((x[i,2] - x[(i-1),2])^2 + (x[i,3] - x[(i-1),3])^2) / (x[i,1] - x[(i-1),1])
       x[i,size1] <- dist
       if (dist < 1) {
-        x[i,size2] <- "Immobile"
-        x[i,(size2+1)] <- 1
+        x[i,size2] <- 1     # need to assign 1 to this to ensure a long string of unique but repeated values
       }
       else {
-        x[i,size2] <- "Mobile"
-        x[i,(size2+1)] <- 0
+        x[i,size2] <- runif(1, max = .99)
       }
     }
   }
+  mintime <- rle(x[,size2])     # this portion needed to ensure we only count freezing that lasts one second or more
+  x[,size2] <- ifelse(rep(mintime$lengths >= 4, times = mintime$lengths), "Immobile", "Mobile")
+  x[,size2+1] <- ifelse(rep(mintime$lengths >= 4, times = mintime$lengths), 1, 0)
   x[,(size2+2)] <- cumsum(x[,(size2+1)])
   x[,(size2+3)] <- cummean(x[,(size2+1)])
   x <- x[,-(size2+1)]
