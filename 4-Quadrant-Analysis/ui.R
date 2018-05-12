@@ -1,4 +1,4 @@
-ui <- navbarPage("4-Quadrant Explorer",
+ui <- navbarPage("4-Quadrant-Analysis",
                  # control panel page
                  tabPanel("Upload",
                           sidebarLayout(
