@@ -1,4 +1,4 @@
-ui <- navbarPage("4-Quadrant-Analysis",
+ui <- navbarPage("4-Quadrant-Analysis", theme = shinytheme("cosmo"),
                  # control panel page
                  tabPanel("Upload",
                           sidebarLayout(
