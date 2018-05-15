@@ -1,3 +1,4 @@
+source("setup.R")     # needed to initialize the app
 server <- function(input, output, session) {
   output$summarytable <- renderTable(show_summary(), na = "--")    # displays the summary table, and changes NA values to something more aesthetically pleasing
   output$resultstable <- renderTable(analyze_data(), na = "--")    # displays the results summary table, and then changes the NA values as well
@@ -12,7 +13,7 @@ server <- function(input, output, session) {
   output$velplotind <- renderPlot(VelocityPlot(get(input$selectedfile1)), 
                                   width = 720, height = 180, res = 72)    # gives a defined length to align the stripes to, allowing correspondence between different plots based on mutual information
   # display graphs
-  output$PIPlot <- renderPlot({
+  output$PIPlot <- renderPlot({ 
     updateplot()
     PerfInd(results)})
   output$FreezePlot <- renderPlot({
@@ -62,6 +63,14 @@ server <- function(input, output, session) {
     updateplot()
     GroupStripe(input$conditionIDfreeze, "Freeze", c("red", "white"))
   }, width = 720, height = 240, res = 72)
+  output$ComparePlot <- renderPlot({
+    updateplot()
+    #INSERT HERE
+  })
+  output$CompareHeatmap <- renderPlot({
+    updateplot()
+    #INSERT HERE
+  })
   # display stats
   output$QuadAnalysis <- renderPrint({
     updateplot()
@@ -90,6 +99,10 @@ server <- function(input, output, session) {
   output$OFAnalysis <- renderPrint({
     updateplot()
     MEANOVA(results2, 9)
+  })
+  output$CompareTable <- renderTable({
+    updateplot()
+    #INSERT HERE
   })
   #download data
   output$downloadResults <- downloadHandler(
@@ -460,5 +473,8 @@ server <- function(input, output, session) {
     updateSelectInput(session, "conditionIDOF", label = "Choose time series condition", choices = conditionlist)
     updateSelectInput(session, "conditionIDquad", label = "Choose time series condition", choices = conditionlist)
     updateSelectInput(session, "conditionIDfreeze", label = "Choose time series condition", choices = conditionlist)
+    #updateSelectInput("conditionIDcompare", label = "Choose comparison condition", choices = conditionlist)
+    #updateSelectInput("compare_X_axis", label = "Choose comparison X-axis metric", choices = results2[,1])
+    #updateSelectInput("compare_Y_axis", label = "Choose comparison Y-axis metric", choices = results2[,1])
   })
 }

@@ -1,3 +1,4 @@
+source("setup.R")     # needed to initialize the app
 ui <- navbarPage("4-Quadrant-Analysis", theme = shinytheme("cosmo"),
                  # control panel page
                  tabPanel("Upload",
@@ -125,6 +126,26 @@ ui <- navbarPage("4-Quadrant-Analysis", theme = shinytheme("cosmo"),
                                          plotOutput("OFStripeAll", height = 240),
                                          plotOutput("OFCDF")),
                                 tabPanel("Paired T-Test/2-factor Mixed-design ANOVA", verbatimTextOutput("OFAnalysis"))
+                              )
+                            )
+                          )
+                 ),
+                 tabPanel("Compare",
+                          sidebarLayout(
+                            sidebarPanel(
+                              h3("Comparison Control Panel"),
+                              selectInput("conditionIDcompare", label = "Choose comparison condition", choices = conditionlist),
+                              selectInput("compare_X_axis", label = "Choose comparison X-axis metric", choices = results2[,1]),
+                              selectInput("compare_Y_axis", label = "Choose comparison Y-axis metric", choices = results2[,1]),
+                              downloadButton("downloadCompareGraph", label = "Download Comparison Graph"),
+                              downloadButton("downloadCompareHeatmap", label = "Download Comparison Heatmap"),
+                              downloadButton("downloadCompareTable", label = "Download Comparison Table")
+                            ),
+                            mainPanel(
+                              tabsetPanel(
+                                tabPanel("Graph", plotOutput("ComparePlot")),
+                                tabPanel("Heatmap", plotOutput("CompareHeatmap")),
+                                tabPanel("Table", plotOutput("CompareTable"))
                               )
                             )
                           )
