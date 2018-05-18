@@ -1,0 +1,51 @@
+{
+  "input": {
+    "analyze": 2,
+    "baselineID": "Baseline",
+    "baselinePeriod": [
+      0,
+      10
+    ],
+    "compare_X_axis": "0",
+    "compare_Y_axis": "0",
+    "conditionIDcompare": "Full",
+    "conditionIDfreeze": "Full",
+    "conditionIDOF": "Full",
+    "conditionIDquad": "Full",
+    "infotypeind": "Quadrant Occupancy",
+    "quadrant": "Lower Right",
+    "selectedfile1": "Test_1",
+    "selectedfile2": "Test_1",
+    "shiny_height": 744,
+    "treatmentID": "cond1",
+    "treatmentPeriod": [
+      12,
+      22
+    ],
+    "typeoftime": "1",
+    "typeoftimeFreeze": "1",
+    "typeoftimeOF": "1",
+    "typeoftimequad": "1",
+    "upload": {
+      "name": [
+        "Test_2"
+      ],
+      "size": [
+        174439
+      ],
+      "type": [
+        ""
+      ],
+      "datapath": [
+        "0"
+      ]
+    }
+  },
+  "output": {
+    "resultstable": "<table  class = 'table shiny-table table- spacing-s' style = 'width:auto;'>\n<thead> <tr> <th style='text-align: left;'> Filename <\/th> <th style='text-align: left;'> Condition <\/th> <th style='text-align: right;'> Lower Left <\/th> <th style='text-align: right;'> Lower Right <\/th> <th style='text-align: right;'> Upper Left <\/th> <th style='text-align: right;'> Upper Right <\/th> <th style='text-align: right;'> Performance Index <\/th> <th style='text-align: right;'> Freezing <\/th> <th style='text-align: right;'> Open Field <\/th>  <\/tr> <\/thead> <tbody>\n  <tr> <td> Test_1 <\/td> <td> Baseline <\/td> <td align=\"right\"> 0.28 <\/td> <td align=\"right\"> 0.22 <\/td> <td align=\"right\"> 0.28 <\/td> <td align=\"right\"> 0.22 <\/td> <td align=\"right\"> -10.87 <\/td> <td align=\"right\"> 0.05 <\/td> <td align=\"right\"> 0.17 <\/td> <\/tr>\n  <tr> <td> Test_1 <\/td> <td> cond1 <\/td> <td align=\"right\"> 0.21 <\/td> <td align=\"right\"> 0.21 <\/td> <td align=\"right\"> 0.28 <\/td> <td align=\"right\"> 0.30 <\/td> <td align=\"right\"> -16.53 <\/td> <td align=\"right\"> 0.14 <\/td> <td align=\"right\"> 0.22 <\/td> <\/tr>\n  <tr> <td> Test_2 <\/td> <td> Baseline <\/td> <td align=\"right\"> 0.26 <\/td> <td align=\"right\"> 0.31 <\/td> <td align=\"right\"> 0.22 <\/td> <td align=\"right\"> 0.21 <\/td> <td align=\"right\"> 23.28 <\/td> <td align=\"right\"> 0.06 <\/td> <td align=\"right\"> 0.16 <\/td> <\/tr>\n  <tr> <td> Test_2 <\/td> <td> cond1 <\/td> <td align=\"right\"> 0.40 <\/td> <td align=\"right\"> 0.20 <\/td> <td align=\"right\"> 0.28 <\/td> <td align=\"right\"> 0.13 <\/td> <td align=\"right\"> -20.20 <\/td> <td align=\"right\"> 0.15 <\/td> <td align=\"right\"> 0.17 <\/td> <\/tr>\n  <tr> <td class='NA'> -- <\/td> <td class='NA'> -- <\/td> <td align=\"right\" class='NA'> -- <\/td> <td align=\"right\" class='NA'> -- <\/td> <td align=\"right\" class='NA'> -- <\/td> <td align=\"right\" class='NA'> -- <\/td> <td align=\"right\" class='NA'> -- <\/td> <td align=\"right\" class='NA'> -- <\/td> <td align=\"right\" class='NA'> -- <\/td> <\/tr>\n   <\/tbody> <\/table>",
+    "summarytable": "<table  class = 'table shiny-table table- spacing-s' style = 'width:auto;'>\n<thead> <tr> <th style='text-align: left;'> Filename <\/th> <th style='text-align: left;'> Treatment <\/th> <th style='text-align: left;'> Baseline On <\/th> <th style='text-align: left;'> Baseline Off <\/th> <th style='text-align: left;'> Treatment On <\/th> <th style='text-align: left;'> Treatment Off <\/th>  <\/tr> <\/thead> <tbody>\n  <tr> <td> Test_1 <\/td> <td> cond1 <\/td> <td> 0 <\/td> <td> 10 <\/td> <td> 12 <\/td> <td> 22 <\/td> <\/tr>\n  <tr> <td> Test_2 <\/td> <td> cond1 <\/td> <td> 0 <\/td> <td> 10 <\/td> <td> 12 <\/td> <td> 22 <\/td> <\/tr>\n  <tr> <td class='NA'> -- <\/td> <td class='NA'> -- <\/td> <td class='NA'> -- <\/td> <td class='NA'> -- <\/td> <td class='NA'> -- <\/td> <td class='NA'> -- <\/td> <\/tr>\n   <\/tbody> <\/table>"
+  },
+  "export": {
+
+  }
+}
