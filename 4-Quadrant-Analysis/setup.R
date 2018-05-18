@@ -21,7 +21,7 @@ results2 <<- c(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
 summarized <<- c(0, 0, 0, 0, 0, 0)
 results <<- as.data.frame(t(data.frame(results, row.names = c("Filename","Condition", "Lower Left", "Lower Right", "Upper Left", "Upper Right", "Performance Index", "Freezing", "Open Field"))))    #creates empty matrix for displaying summary results on first page
 results2 <<- as.data.frame(t(data.frame(results2, row.names= c("Filename","Condition", "Lower Left", "Lower Right", "Upper Left", "Upper Right", "Performance Index", "Freezing", "Open Field", "Group", "Sequence"))))   #creates empty matrix for storing extended results for manipulation and export
-summarized <<- as.data.frame(t(data.frame(summarized, col.names = c("Filename", "Treatment", "Baseline On", "Baseline Off", "Treatment On", "Treatment Off"))))     #creates empty matrix for displaying metadata on first page
+summarized <<- as.data.frame(t(data.frame(summarized, row.names = c("Filename", "Treatment", "Baseline On", "Baseline Off", "Treatment On", "Treatment Off"))))     #creates empty matrix for displaying metadata on first page
 conditionlist <<- "Full"     #creates list of conditions, enters "Full" as first input, because there is no input to define the condition and it will always be present
 filelist <<- NA   #creates the initial list of files, gets removed later once files uploaded, will not display
 
