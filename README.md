@@ -20,7 +20,7 @@ This tool has 2 current implementations.
 
 Navigate to the directory containing your local repository in the terminal by inputting `cd insert/path/here` 
 
-Initialize R in the terminal by simply inputting the letter `R`, then input `install.packages(c("shiny", "shinythemes", "ggplot2", "reshape2", "dplyr", "nlme", "car", "multcomp", "scales", "evaluate")` and follow the subsequent directions to install the following packages required for the application to function:
+Initialize R in the terminal by simply inputting the letter `R`, then input `install.packages(c("shiny", "shinythemes", "ggplot2", "reshape2", "dplyr", "nlme", "car", "multcomp", "scales", "evaluate"))` and follow the subsequent directions to install the following packages required for the application to function:
 
   * shiny
   * shinythemes
