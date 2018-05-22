@@ -32,3 +32,6 @@ before_install:
 
 script:
   - R -f run_tests.R
+  
+  after_success:
+  - Rscript -e 'covr::coveralls()'
