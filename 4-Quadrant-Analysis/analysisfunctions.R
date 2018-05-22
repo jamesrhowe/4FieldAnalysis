@@ -205,7 +205,7 @@ MEANOVA <- function(x, coln) {
   anovamat <<- melt(anovamat)     # data needs to be in long format to work properly in the lme() and aov() functions
   anovamat <<- anovamat[,-4]
   if (nlevels(anovamat$Group) == 1) {
-    return(t.test(value ~ Sequence, data = anovamat, paired = TRUE, conf.level = .95))
+    return(capture.output(t.test(value ~ Sequence, data = anovamat, paired = TRUE, conf.level = .95)))
   }
   else {
     aovx <<- lme(value ~ Group + Sequence + Group*Sequence, random = ~ Sequence|Filename, data = anovamat, control = list(opt = "optim"))

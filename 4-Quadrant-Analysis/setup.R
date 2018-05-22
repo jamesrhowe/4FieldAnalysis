@@ -24,6 +24,7 @@ results2 <<- as.data.frame(t(data.frame(results2, row.names= c("Filename","Condi
 summarized <<- as.data.frame(t(data.frame(summarized, row.names = c("Filename", "Treatment", "Baseline On", "Baseline Off", "Treatment On", "Treatment Off"))))     #creates empty matrix for displaying metadata on first page
 conditionlist <<- "Full"     #creates list of conditions, enters "Full" as first input, because there is no input to define the condition and it will always be present
 filelist <<- NA   #creates the initial list of files, gets removed later once files uploaded, will not display
+comparelist <<- c("Upper Left Occupancy", "Upper Right Occupancy", "Lower Left Occupancy", "Lower Right Occupancy", "Performance Index", "Immobility", "Center Occupancy")
 
 # create full-length dataframes independent of baseline or treatment ID
 

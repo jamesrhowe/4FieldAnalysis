@@ -135,8 +135,8 @@ ui <- navbarPage("4-Quadrant-Analysis", theme = shinytheme("cosmo"),
                             sidebarPanel(
                               h3("Comparison Control Panel"),
                               selectInput("conditionIDcompare", label = "Choose comparison condition", choices = conditionlist),
-                              selectInput("compare_X_axis", label = "Choose comparison X-axis metric", choices = results2[,1]),
-                              selectInput("compare_Y_axis", label = "Choose comparison Y-axis metric", choices = results2[,1]),
+                              selectInput("compare_X_axis", label = "Choose comparison X-axis metric", choices = comparelist),
+                              selectInput("compare_Y_axis", label = "Choose comparison Y-axis metric", choices = comparelist),
                               downloadButton("downloadCompareGraph", label = "Download Comparison Graph"),
                               downloadButton("downloadCompareHeatmap", label = "Download Comparison Heatmap"),
                               downloadButton("downloadCompareTable", label = "Download Comparison Table")

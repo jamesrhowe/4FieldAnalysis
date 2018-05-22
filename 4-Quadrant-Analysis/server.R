@@ -29,18 +29,9 @@ server <- function(input, output, session) {
                               width = 720, height = 360, res = 72)
   output$QuadCDF <- renderPlot({
     updateplot()
-    if (input$quadrant == "Lower Right") {
-      quadlabel <- "LR"
-    }
-    if (input$quadrant == "Lower Left") {
-      quadlabel <- "LL"
-    }
-    if (input$quadrant == "Upper Right") {
-      quadlabel <- "UR"
-    }
-    if (input$quadrant == "Upper Left") {    # need to keep last statement as an if{} instead of else{} to impute correct conditions
-      quadlabel <- "UL"
-    }
+    input_list <- c("Lower Right", "Lower Left", "Upper Right", "Upper Left")
+    quadlabel_list <- c("LR", "LL", "UR", "UL")
+    quadlabel <- quadlabel_list[grep(input$quadrant, input_list)]
     GroupCDF(input$conditionIDquad, quadlabel, input$typeoftimequad)
   }, width = 720, height = 400, res = 72)
   output$FreezeCDF <- renderPlot({
@@ -65,7 +56,7 @@ server <- function(input, output, session) {
   }, width = 720, height = 240, res = 72)
   output$ComparePlot <- renderPlot({
     updateplot()
-    #INSERT HERE
+    AxisCompare(results2, input$compare_X_axis, input$compare_Y_axis, input$conditionIDcompare)
   })
   output$CompareHeatmap <- renderPlot({
     updateplot()
@@ -74,18 +65,9 @@ server <- function(input, output, session) {
   # display stats
   output$QuadAnalysis <- renderPrint({
     updateplot()
-    if (input$quadrant == "Lower Right") {
-      quad <- 4
-    }
-    if (input$quadrant == "Lower Left") {
-      quad <- 3
-    }
-    if (input$quadrant == "Upper Right") {
-      quad <- 6
-    }
-    if (input$quadrant == "Upper Left") {    # need to keep last statement as an if{} instead of else{} statement to impute correct conditions
-      quad <- 5
-    }
+    input_list <- c("Lower Right", "Lower Left", "Upper Right", "Upper Left")
+    quadlabel_list <- c(4, 3, 6, 5)
+    quad <- quadlabel_list[grep(input$quadrant, input_list)]
     MEANOVA(results2, quad)
   })
   output$PIAnalysis <- renderPrint({
@@ -297,28 +279,16 @@ server <- function(input, output, session) {
   )
   output$downloadCDFInd <- downloadHandler(
     filename = function() {
+      type_list <- c("Quadrant Occupancy", "Freezing", "Center Occupancy")
+      name_list <- c("Quadrant", "Freezing", "Open Field")
+      name_num <- grep(input$infotypeind, type_list)
       if (input$typeoftime == 1){
-        if (input$infotypeind == "Quadrant Occupancy") {
-          paste(input$selectedfile1,"Mean Quadrant Time Series.png")
-        }
-        if (input$infotypeind == "Freezing") {
-          paste(input$selectedfile1,"Mean Freezing Time Series.png")
-        }
-        if (input$infotypeind == "Center Occupancy") {     # need to keep last statement as an if{} instead of else{} statement to impute correct conditions
-          paste(input$selectedfile1,"Mean Open Field Time Series.png")
-        }
+        time_type <- "Mean"
       }
       else {
-        if (input$infotypeind == "Quadrant Occupancy") {
-          paste(input$selectedfile1,"Total Quadrant Time Series.png")
-        }
-        if (input$infotypeind == "Freezing") {
-          paste(input$selectedfile1,"Total Freezing Time Series.png")
-        }
-        if (input$infotypeind == "Center Occupancy") {      # need to keep last statement as an if{} instead of else{} statement to impute correct conditions
-          paste(input$selectedfile1,"Total Open Field Time Series.png")
-        }
+        time_type <- "Total"
       }
+      paste(input$selectedfile1, time_type, name_list[name_num], "Time Series.png")
     },
     content = function(file) {
       image <- IndCDF(get(input$selectedfile1), input$typeoftime, input$infotypeind)
@@ -330,33 +300,15 @@ server <- function(input, output, session) {
   #download stats
   output$downloadQuadStats <- downloadHandler(
     filename = function() {
-      if (input$quadrant == "Lower Right") {
-        quadn <- "Lower_Right"
-      }
-      if (input$quadrant == "Lower Left") {
-        quadn <- "Lower_Left"
-      }
-      if (input$quadrant == "Upper Right") {
-        quadn <- "Upper_Right"
-      }
-      if (input$quadrant == "Upper Left") {    # need to keep last statement as an if{} instead of else{} statement to impute correct conditions
-        quadn <- "Upper_Left"
-      }
+      info_list <- c("Lower Right", "Lower Left", "Upper Right", "Upper Left")
+      quad_list <- c("Lower_Right", "Lower_Left", "Upper_Right", "Upper_Left")
+      quadn <- quad_list[grep(input$quadrant, info_list)]
       paste0("QuadrantStats_",quadn,"_",Sys.Date(),".txt")
     },
     content = function(file) {
-      if (input$quadrant == "Lower Right") {
-        quad <- 4
-      }
-      if (input$quadrant == "Lower Left") {
-        quad <- 3
-      }
-      if (input$quadrant == "Upper Right") {
-        quad <- 6
-      }
-      if (input$quadrant == "Upper Left") {    # need to keep last statement as an if{} instead of else{} statement to impute correct conditions
-        quad <- 5
-      }
+      info_list <- c("Lower Right", "Lower Left", "Upper Right", "Upper Left")
+      quad_list <- c(4, 3, 6, 5)
+      quad <- quad_list[grep(input$quadrant, info_list)]
       statout <- MEANOVA(results2, quad)
       write(statout, file)
     }
@@ -473,8 +425,8 @@ server <- function(input, output, session) {
     updateSelectInput(session, "conditionIDOF", label = "Choose time series condition", choices = conditionlist)
     updateSelectInput(session, "conditionIDquad", label = "Choose time series condition", choices = conditionlist)
     updateSelectInput(session, "conditionIDfreeze", label = "Choose time series condition", choices = conditionlist)
-    #updateSelectInput("conditionIDcompare", label = "Choose comparison condition", choices = conditionlist)
-    #updateSelectInput("compare_X_axis", label = "Choose comparison X-axis metric", choices = results2[,1])
-    #updateSelectInput("compare_Y_axis", label = "Choose comparison Y-axis metric", choices = results2[,1])
+    updateSelectInput(session, "conditionIDcompare", label = "Choose comparison condition", choices = conditionlist)
+    updateSelectInput(session, "compare_X_axis", label = "Choose comparison X-axis metric", choices = comparelist)
+    updateSelectInput(session, "compare_Y_axis", label = "Choose comparison Y-axis metric", choices = comparelist)
   })
 }

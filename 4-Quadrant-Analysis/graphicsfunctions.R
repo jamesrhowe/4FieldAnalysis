@@ -123,61 +123,25 @@ GroupStripe <- function(condition, type, colorlist) {
 
 # Grouped CDF plots
 GroupCDF <- function(condition, label, type) {
+  label_list <- c("Freeze", "LR", "UR", "LL", "UL", "OF")
+  label_num <- grep(label, label_list)
   if (type == 1) {
     x <- data.frame(get(paste0(label,condition,"Proportion")), stringsAsFactors = FALSE)
-    if (label == "Freeze") {
-      axislab <- "Time Immobile (%)"
-    }
-    if (label == "LR") {
-      axislab <- "Lower Right Occupancy (%)"
-    }
-    if (label == "UR") {
-      axislab <- "Upper Right Occupancy (%)"
-    }
-    if (label == "LL") {
-      axislab <- "Lower Left Occupancy (%)"
-    }
-    if (label == "UL") {
-      axislab <- "Upper Left Occupancy (%)"
-    }
-    if (label == "OF") {    # need to keep last statement as an if{} instead of else{} statement to impute correct conditions
-      axislab <- "Center Occupancy (%)"
-    }
+    axislablist <- c("Time Immobile (%)", "Lower Right Occupancy (%)", "Upper Right Occupancy (%)", "Lower Left Occupancy (%)", "Upper Left Occupancy (%)", "Center Occupancy (%)")
   }
   else {
     x <- data.frame(get(paste0(label,condition,"Cumulative")), stringsAsFactors = FALSE)
-    if (label == "Freeze") {
-      axislab <- "Cumulative Time Immobile (sec)"
-    }
-    if (label == "LR") {
-      axislab <- "Cumulative Lower Right Occupancy (sec)"
-    }
-    if (label == "UR") {
-      axislab <- "Cumulative Upper Right Occupancy (sec)"
-    }
-    if (label == "LL") {
-      axislab <- "Cumulative Lower Left Occupancy (sec)"
-    }
-    if (label == "UL") {
-      axislab <- "Cumulative Upper Left Occupancy (sec)"
-    }
-    if (label == "OF") {    # need to keep last statement as an if{} instead of else{} statement to impute correct conditions
-      axislab <- "Cumulative Center Occupancy (sec)"
-    }
+    axislablist <- c("Cumulative Time Immobile (sec)", "Cumulative Lower Right Occupancy (sec)", "Cumulative Upper Right Occupancy (sec)", "Cumulative Lower Left Occupancy (sec)", "Cumulative Upper Left Occupancy (sec)", "Cumulative Center Occupancy (sec)")
   }
   colnames(x) <- 0:as.numeric(dim(t(x))[1] - 1)
   x[] <- lapply(x, as.numeric)
   x[,1] <- "placeholder"
-  vec <- x[,-1]
-  vec <- rowMeans(vec)
   x <- melt(x)
   x[,1] <- rep(seq(from = 0, to = ((dim(x)[1]/length(levels(x[,2]))-1)/240), by = (1/240)), length.out = dim(x)[1])
-  x <- cbind.data.frame(x, vec)
   x$value <- x$value * 100
-  x$vec <- x$vec * 100
-  ggplot(x, aes(`0`, value)) + stat_summary(geom="ribbon", fun.data=mean_cl_normal, fun.args=list(conf.int=0.95), fill="grey", alpha = .4) + geom_line(aes(colour = variable)) + geom_line(aes(y = vec), linetype = 2) +
+  ggplot(x, aes(`0`, value)) + geom_line(aes(colour = variable)) + geom_smooth(method = "loess", linetype = 2, colour = "black", span = 0.25, se = FALSE) +
     scale_colour_manual(values = c("red", "blue", "forestgreen", "purple4", "darkorange", "cornflowerblue", "indianred", "chartreuse3", "blue4", "maroon", "olivedrab", "darkmagenta", "sandybrown", "seagreen", "lightgreen", "lightcoral", "slategrey", "steelblue")) + 
-    xlab("Time (min)") + ylab(axislab) + scale_y_continuous(expand = c(0,0)) + 
+    xlab("Time (min)") + ylab(axislablist[label_num]) + scale_y_continuous(expand = c(0,0)) + 
     scale_x_continuous(expand = c(0,0), breaks = pretty_breaks()) +
     theme(legend.position="none", panel.background = element_blank(), panel.grid.major = element_blank(), 
           panel.grid.minor = element_blank(), axis.line = element_line(colour = "black"))
@@ -238,3 +202,43 @@ OFFComp <- function(x, coln, label) {
           legend.key = element_rect(fill = NA, color = NA), legend.direction = "horizontal", strip.text.x = element_blank()) + facet_wrap(~ Group, scales="free")
 }
 
+# Comparison line plot
+AxisCompare <- function(x, x_cond, y_cond, cond) {
+  x2 <- na.omit(x)
+  x2[,7] <- x2[,7] / 100      # needed to prevent performance index values from being inflated
+  num_x <- grep(x_cond, comparelist)      # makes much more efficient than many nested if() statements
+  num_y <- grep(y_cond, comparelist)
+  colnames(x2)[num_x + 2] <- "type_x"
+  if (x_cond == y_cond) {     # need this to ensure that no errors occur if the same metric is used on both axes
+    x2$type_y <- x2$type_x
+  }
+  else {
+    colnames(x2)[num_y + 2] <- "type_y" 
+  }
+  x2$type_x <- x2$type_x * 100      # to turn decimal into percentage for graph
+  x2$type_y <- x2$type_y * 100
+  axislablist <- c("Upper Left Occupancy (%)", "Upper Right Occupancy (%)", "Lower Left Occupancy (%)", "Lower Right Occupancy (%)", "Performance Index", "Time Immobile (%)", "Center Occupancy (%)")
+  if (cond == "Full") {
+    plot <- ggplot(x2, aes(type_x, type_y)) + geom_smooth(method = lm, linetype = 2, colour = "black", fullrange = TRUE) + xlab(axislablist[num_x]) + ylab(axislablist[num_y]) + 
+    geom_point(aes(fill = Condition), shape = 21, stroke = 1, colour = "black", na.rm = TRUE, size = 4) +
+    scale_fill_manual(values = c("red", "blue", "forestgreen", "purple4", "darkorange")) + 
+    scale_x_continuous(expand = c(0,0), breaks = pretty_breaks(), limits = c(min(x2$type_x) - (5+(abs(mean(x2$type_x)*.15))), max(x2$type_x) + (5+abs(mean(x2$type_x)*.15)))) + 
+    coord_cartesian(xlim = c(min(x2$type_x) - abs(mean(x2$type_x)*.1), max(x2$type_x) + abs(mean(x2$type_x)*.1))) +
+    theme(legend.position="top", panel.background = element_blank(), panel.grid.major = element_blank(), 
+          panel.grid.minor = element_blank(), axis.line = element_line(colour = "black"), legend.text=element_text(size=20), legend.title=element_blank(),
+          axis.title.y = element_text(size=20), axis.text.y = element_text(size=15), axis.title.x = element_text(size=20), axis.text.x = element_text(size=15),
+          strip.background = element_blank(), legend.key = element_rect(fill = NA, color = NA), legend.direction = "horizontal", strip.text.x = element_blank())
+  }
+  if (cond != "Full") {
+    x2 <- x2[grep(cond, x2$Condition),]
+    plot <- ggplot(x2, aes(type_x, type_y)) + geom_smooth(method = lm, linetype = 2, colour = "black", fullrange = TRUE) + xlab(axislablist[num_x]) + ylab(axislablist[num_y]) + 
+      geom_point(fill = "white", shape = 21, stroke = 1, colour = "black", na.rm = TRUE, size = 4) +
+      scale_x_continuous(expand = c(0,0), breaks = pretty_breaks(), limits = c(min(x2$type_x) - (5+(abs(mean(x2$type_x)*.15))), max(x2$type_x) + (5+abs(mean(x2$type_x)*.15)))) + 
+      coord_cartesian(xlim = c(min(x2$type_x) - abs(mean(x2$type_x)*.1), max(x2$type_x) + abs(mean(x2$type_x)*.1))) +
+      theme(legend.position="none", panel.background = element_blank(), panel.grid.major = element_blank(), 
+            panel.grid.minor = element_blank(), axis.line = element_line(colour = "black"), legend.text=element_text(size=20), legend.title=element_blank(),
+            axis.title.y = element_text(size=20), axis.text.y = element_text(size=15), axis.title.x = element_text(size=20), axis.text.x = element_text(size=15),
+            strip.background = element_blank(), legend.key = element_rect(fill = NA, color = NA), legend.direction = "horizontal", strip.text.x = element_blank())
+  }
+  return(plot)
+  }
