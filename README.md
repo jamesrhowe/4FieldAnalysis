@@ -20,18 +20,20 @@ This tool has 2 current implementations.
 
 Navigate to the directory containing your local repository in the terminal by inputting `cd insert/path/here` 
 
-Initialize R in the terminal by simply inputting the letter `R`, then input `install.packages(c("shiny", "shinythemes", "ggplot2", "reshape2", "dplyr", "nlme", "car", "multcomp", "scales", "evaluate"))` and follow the subsequent directions to install the following packages required for the application to function:
+Initialize R in the terminal by simply inputting the letter `R`, then input `install.packages(c("car", "colorRamps", "covr", "dplyr", "evaluate", "ggplot2", "multcomp", "nlme", "reshape2", "scales", "shiny", "shinythemes"))` and follow the subsequent directions to install the following packages required for the application to function:
 
-  * shiny
-  * shinythemes
-  * ggplot2
-  * reshape2
-  * dplyr
-  * nlme
-  * car
-  * multcomp
-  * scales
-  * evaluate
+  * [car](https://cran.r-project.org/web/packages/car/car.pdf)
+  * [colorRamps](https://cran.r-project.org/web/packages/colorRamps/colorRamps.pdf)
+  * [covr](https://cran.r-project.org/web/packages/covr/covr.pdf)
+  * [dplyr](https://cran.r-project.org/web/packages/dplyr/dplyr.pdf)
+  * [evaluate](https://cran.rstudio.com/web/packages/evaluate/evaluate.pdf)
+  * [ggplot2](https://cran.r-project.org/web/packages/ggplot2/ggplot2.pdf)
+  * [multcomp](https://cran.r-project.org/web/packages/multcomp/multcomp.pdf)
+  * [nlme](https://cran.r-project.org/web/packages/nlme/nlme.pdf)
+  * [reshape2](https://cran.r-project.org/web/packages/reshape2/reshape2.pdf)
+  * [scales](https://cran.r-project.org/web/packages/scales/scales.pdf)
+  * [shiny](https://cran.r-project.org/web/packages/shiny/shiny.pdf)
+  * [shinythemes](https://cran.r-project.org/web/packages/shinythemes/shinythemes.pdf)
   
 #### Local Initialization
   
