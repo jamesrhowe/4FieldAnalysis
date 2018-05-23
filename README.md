@@ -20,7 +20,7 @@ This tool has 2 current implementations.
 
 Navigate to the directory containing your local repository in the terminal by inputting `cd insert/path/here` 
 
-Initialize R in the terminal by simply inputting the letter `R`, then input `install.packages(c("car", "colorRamps", "covr", "dplyr", "evaluate", "ggplot2", "multcomp", "nlme", "reshape2", "scales", "shiny", "shinythemes"))` and follow the subsequent directions to install the following packages required for the application to function:
+Initialize R in the terminal by simply inputting the letter `R`, then input `install.packages(c("car", "colorRamps", "covr", "dplyr", "evaluate", "ggplot2", "multcomp", "nlme", "reshape2", "scales", "shiny", "shinythemes"))` and follow the subsequent directions to install the following packages (which are also included in the packrat directory) required for the application to function:
 
   * [car](https://cran.r-project.org/web/packages/car/car.pdf)
   * [colorRamps](https://cran.r-project.org/web/packages/colorRamps/colorRamps.pdf)
