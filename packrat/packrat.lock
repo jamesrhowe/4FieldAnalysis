@@ -44,7 +44,7 @@ Package: RcppEigen
 Source: CRAN
 Version: 0.3.3.4.0
 Hash: 134344925b2aff5e2522ae707a55b0f8
-Requires: Rcpp, Matrix
+Requires: Matrix, Rcpp
 
 Package: SparseM
 Source: CRAN
@@ -93,8 +93,8 @@ Package: car
 Source: CRAN
 Version: 3.0-0
 Hash: 1a046ad6ed92eeeec63054d990c83a20
-Requires: MASS, abind, carData, nnet, nlme, mgcv, maptools, quantreg,
-    lme4, pbkrtest, rio
+Requires: MASS, abind, carData, lme4, maptools, mgcv, nlme, nnet,
+    pbkrtest, quantreg, rio
 
 Package: carData
 Source: CRAN
@@ -132,7 +132,7 @@ Package: covr
 Source: CRAN
 Version: 3.1.0
 Hash: 55eaad0d3e61626cc0c8928985a849fa
-Requires: crayon, digest, jsonlite, withr, rex, httr
+Requires: crayon, digest, httr, jsonlite, rex, withr
 
 Package: crayon
 Source: CRAN
@@ -169,8 +169,8 @@ Package: dplyr
 Source: CRAN
 Version: 0.7.4
 Hash: cf677ec8dad7a45d1397dd7e72ef30c6
-Requires: BH, R6, Rcpp, assertthat, glue, magrittr, pkgconfig, plogr,
-    rlang, bindrcpp, tibble
+Requires: BH, R6, Rcpp, assertthat, bindrcpp, glue, magrittr,
+    pkgconfig, plogr, rlang, tibble
 
 Package: evaluate
 Source: CRAN
@@ -193,7 +193,7 @@ Package: ggplot2
 Source: CRAN
 Version: 2.2.1
 Hash: 46e5cb78836848aa44655e577433f54b
-Requires: MASS, digest, gtable, lazyeval, plyr, scales, reshape2,
+Requires: MASS, digest, gtable, lazyeval, plyr, reshape2, scales,
     tibble
 
 Package: glue
@@ -210,7 +210,7 @@ Package: haven
 Source: CRAN
 Version: 1.1.1
 Hash: 9b11d96dcd65d5dab200b1979226bac3
-Requires: Rcpp, hms, tibble, forcats, readr
+Requires: Rcpp, forcats, hms, readr, tibble
 
 Package: hms
 Source: CRAN
@@ -228,7 +228,7 @@ Package: htmlwidgets
 Source: CRAN
 Version: 1.2
 Hash: de18b75f31630089b22e30d4b188cfbe
-Requires: jsonlite, yaml, htmltools
+Requires: htmltools, jsonlite, yaml
 
 Package: httpuv
 Source: CRAN
@@ -272,7 +272,7 @@ Package: lme4
 Source: CRAN
 Version: 1.1-17
 Hash: a41aab354a4af353838c78afcbe4cb82
-Requires: MASS, Rcpp, lattice, nloptr, minqa, Matrix, nlme, RcppEigen
+Requires: MASS, Matrix, Rcpp, RcppEigen, lattice, minqa, nlme, nloptr
 
 Package: magrittr
 Source: CRAN
@@ -306,7 +306,7 @@ Package: multcomp
 Source: CRAN
 Version: 1.4-8
 Hash: 567147e7257cc1b38b22b34a8c6697c0
-Requires: codetools, mvtnorm, survival, sandwich, TH.data
+Requires: TH.data, codetools, mvtnorm, sandwich, survival
 
 Package: munsell
 Source: CRAN
@@ -366,7 +366,7 @@ Package: pillar
 Source: CRAN
 Version: 1.2.2
 Hash: 9c4da206e8c0b21a14667c1baf69ee52
-Requires: crayon, rlang, utf8, cli
+Requires: cli, crayon, rlang, utf8
 
 Package: pingr
 Source: CRAN
@@ -403,13 +403,13 @@ Package: promises
 Source: CRAN
 Version: 1.0.1
 Hash: 1da7acbbc5a36e97d715bf15e72894cd
-Requires: R6, Rcpp, magrittr, rlang, later
+Requires: R6, Rcpp, later, magrittr, rlang
 
 Package: quantreg
 Source: CRAN
 Version: 5.35
 Hash: 19eba9095f4e5ead2de5a35211bdbb7b
-Requires: SparseM, Matrix, MatrixModels
+Requires: Matrix, MatrixModels, SparseM
 
 Package: readr
 Source: CRAN
@@ -421,7 +421,7 @@ Package: readxl
 Source: CRAN
 Version: 1.1.0
 Hash: 662d00d972d242ff41d5166685ecc951
-Requires: Rcpp, tibble, cellranger
+Requires: Rcpp, cellranger, tibble
 
 Package: rematch
 Source: CRAN
@@ -444,7 +444,7 @@ Package: rio
 Source: CRAN
 Version: 0.5.10
 Hash: 98b9636341c1979dd8f0ea93a9922384
-Requires: curl, data.table, foreign, openxlsx, tibble, readxl, haven
+Requires: curl, data.table, foreign, haven, openxlsx, readxl, tibble
 
 Package: rlang
 Source: CRAN
@@ -461,23 +461,23 @@ Package: scales
 Source: CRAN
 Version: 0.5.0
 Hash: de72bbfa723acfaa28bb99788a303987
-Requires: R6, RColorBrewer, Rcpp, dichromat, labeling, viridisLite,
-    plyr, munsell
+Requires: R6, RColorBrewer, Rcpp, dichromat, labeling, munsell, plyr,
+    viridisLite
 
 Package: shiny
 Source: CRAN
 Version: 1.0.5
 Hash: 4d47532a807122bfd6bc3818310f9d2e
-Requires: R6, digest, jsonlite, mime, sourcetools, xtable, htmltools,
-    httpuv
+Requires: R6, digest, htmltools, httpuv, jsonlite, mime, sourcetools,
+    xtable
 
 Package: shinytest
 Source: github
 Version: 1.3.0
 Hash: 99b94300e758f02297c58c646a02ec4c
-Requires: R6, assertthat, crayon, digest, jsonlite, parsedate, pingr,
-    rematch, withr, debugme, httr, testthat, htmlwidgets, callr,
-    httpuv, webdriver, shiny
+Requires: R6, assertthat, callr, crayon, debugme, digest, htmlwidgets,
+    httpuv, httr, jsonlite, parsedate, pingr, rematch, shiny, testthat,
+    webdriver, withr
 GithubRepo: shinytest
 GithubUsername: rstudio
 GithubRef: master
@@ -531,13 +531,13 @@ Package: testthat
 Source: CRAN
 Version: 2.0.0
 Hash: 537114b476376c5773bf3c557f5bbd19
-Requires: R6, crayon, digest, magrittr, praise, rlang, withr, cli
+Requires: R6, cli, crayon, digest, magrittr, praise, rlang, withr
 
 Package: tibble
 Source: CRAN
 Version: 1.4.2
 Hash: 83895360ce4f8d2ce92eee00526b5b0b
-Requires: crayon, rlang, cli, pillar
+Requires: cli, crayon, pillar, rlang
 
 Package: utf8
 Source: CRAN
@@ -553,8 +553,8 @@ Package: webdriver
 Source: CRAN
 Version: 1.0.5
 Hash: 886b77eebfb8ba4fbfa31935fb8fd19b
-Requires: R6, base64enc, curl, jsonlite, withr, debugme, httr,
-    showimage, callr
+Requires: R6, base64enc, callr, curl, debugme, httr, jsonlite,
+    showimage, withr
 
 Package: withr
 Source: CRAN
