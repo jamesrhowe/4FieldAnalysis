@@ -1,5 +1,7 @@
 # Graphics calls used by the app
 
+source("analysisfunctions.R")     # contains all the analytic functions, makes plotting more efficient
+
 # Individual trial plots
 
 # Path plot to summarize total mouse motion
@@ -204,41 +206,70 @@ OFFComp <- function(x, coln, label) {
 
 # Comparison line plot
 AxisCompare <- function(x, x_cond, y_cond, cond) {
-  x2 <- na.omit(x)
-  x2[,7] <- x2[,7] / 100      # needed to prevent performance index values from being inflated
-  num_x <- grep(x_cond, comparelist)      # makes much more efficient than many nested if() statements
-  num_y <- grep(y_cond, comparelist)
-  colnames(x2)[num_x + 2] <- "type_x"
-  if (x_cond == y_cond) {     # need this to ensure that no errors occur if the same metric is used on both axes
-    x2$type_y <- x2$type_x
-  }
-  else {
-    colnames(x2)[num_y + 2] <- "type_y" 
-  }
-  x2$type_x <- x2$type_x * 100      # to turn decimal into percentage for graph
-  x2$type_y <- x2$type_y * 100
+  LinReg_Compare(x, x_cond, y_cond, cond)
   axislablist <- c("Upper Left Occupancy (%)", "Upper Right Occupancy (%)", "Lower Left Occupancy (%)", "Lower Right Occupancy (%)", "Performance Index", "Time Immobile (%)", "Center Occupancy (%)")
   if (cond == "Full") {
-    plot <- ggplot(x2, aes(type_x, type_y)) + geom_smooth(method = lm, linetype = 2, colour = "black", fullrange = TRUE) + xlab(axislablist[num_x]) + ylab(axislablist[num_y]) + 
+    plot <- ggplot(current_comparison, aes(x_condition, x_condition)) + geom_smooth(method = lm, linetype = 2, colour = "black", fullrange = TRUE) + xlab(axislablist[num_x]) + ylab(axislablist[num_y]) + 
     geom_point(aes(fill = Condition), shape = 21, stroke = 1, colour = "black", na.rm = TRUE, size = 4) +
     scale_fill_manual(values = c("red", "blue", "forestgreen", "purple4", "darkorange")) + 
-    scale_x_continuous(expand = c(0,0), breaks = pretty_breaks(), limits = c(min(x2$type_x) - (5+(abs(mean(x2$type_x)*.15))), max(x2$type_x) + (5+abs(mean(x2$type_x)*.15)))) + 
-    coord_cartesian(xlim = c(min(x2$type_x) - abs(mean(x2$type_x)*.1), max(x2$type_x) + abs(mean(x2$type_x)*.1))) +
+    scale_x_continuous(expand = c(0,0), breaks = pretty_breaks(), limits = c(min(current_comparison$x_condition) - (5+(abs(mean(current_comparison$x_condition)*.15))), max(current_comparison$x_condition) + (5+abs(mean(current_comparison$x_condition)*.15)))) + 
+    coord_cartesian(xlim = c(min(current_comparison$x_condition) - abs(mean(current_comparison$x_condition)*.1), max(current_comparison$x_condition) + abs(mean(current_comparison$x_condition)*.1))) +
     theme(legend.position="top", panel.background = element_blank(), panel.grid.major = element_blank(), 
           panel.grid.minor = element_blank(), axis.line = element_line(colour = "black"), legend.text=element_text(size=20), legend.title=element_blank(),
           axis.title.y = element_text(size=20), axis.text.y = element_text(size=15), axis.title.x = element_text(size=20), axis.text.x = element_text(size=15),
           strip.background = element_blank(), legend.key = element_rect(fill = NA, color = NA), legend.direction = "horizontal", strip.text.x = element_blank())
   }
   if (cond != "Full") {
-    x2 <- x2[grep(cond, x2$Condition),]
-    plot <- ggplot(x2, aes(type_x, type_y)) + geom_smooth(method = lm, linetype = 2, colour = "black", fullrange = TRUE) + xlab(axislablist[num_x]) + ylab(axislablist[num_y]) + 
+    current_comparison <- current_comparison[grep(cond, current_comparison$Condition),]
+    plot <- ggplot(current_comparison, aes(x_condition, y_condition)) + geom_smooth(method = lm, linetype = 2, colour = "black", fullrange = TRUE) + xlab(axislablist[num_x]) + ylab(axislablist[num_y]) + 
       geom_point(fill = "white", shape = 21, stroke = 1, colour = "black", na.rm = TRUE, size = 4) +
-      scale_x_continuous(expand = c(0,0), breaks = pretty_breaks(), limits = c(min(x2$type_x) - (5+(abs(mean(x2$type_x)*.15))), max(x2$type_x) + (5+abs(mean(x2$type_x)*.15)))) + 
-      coord_cartesian(xlim = c(min(x2$type_x) - abs(mean(x2$type_x)*.1), max(x2$type_x) + abs(mean(x2$type_x)*.1))) +
+      scale_x_continuous(expand = c(0,0), breaks = pretty_breaks(), limits = c(min(current_comparison$x_condition) - (5+(abs(mean(current_comparison$x_condition)*.15))), max(current_comparison$x_condition) + (5+abs(mean(current_comparison$x_condition)*.15)))) + 
+      coord_cartesian(xlim = c(min(current_comparison$x_condition) - abs(mean(current_comparison$x_condition)*.1), max(current_comparison$x_condition) + abs(mean(current_comparison$x_condition)*.1))) +
       theme(legend.position="none", panel.background = element_blank(), panel.grid.major = element_blank(), 
             panel.grid.minor = element_blank(), axis.line = element_line(colour = "black"), legend.text=element_text(size=20), legend.title=element_blank(),
             axis.title.y = element_text(size=20), axis.text.y = element_text(size=15), axis.title.x = element_text(size=20), axis.text.x = element_text(size=15),
             strip.background = element_blank(), legend.key = element_rect(fill = NA, color = NA), legend.direction = "horizontal", strip.text.x = element_blank())
   }
   return(plot)
+}
+
+LinReg_Display <- function(x, x_cond, y_cond, cond) {
+  LinReg_Compare(x, x_cond, y_cond, cond)
+  rownames(current_comparison) <- paste(current_comparison$Filename, current_comparison$Condition)
+  if (cond == "Full") {
+    all_inputs <- current_comparison
+    model <- lm(y_condition ~ x_condition, all_inputs)
+    return(capture.output(summary(model)))
   }
+  if (cond != "Full") {
+    selected_inputs <- current_comparison[grep(cond, current_comparison$Condition),]
+    model <- lm(y_condition ~ x_condition, selected_inputs)
+    return(capture.output(summary(model)))
+  }
+}
+
+# Comparison Heatmap
+
+Compare_Heatmap <- function(x, cond, display_type) {
+  Total_Compare(x, cond)
+  if (display_type == 1) {
+    image <- ggplot(total_comparison, aes(x = total_comparison[,1], y = factor(total_comparison[,2], 
+      level = c('Lower Left', 'Lower Right', 'Upper Left', 'Upper Right', 'Performance Index', 'Freezing', 'Open Field')))) + 
+      geom_tile(aes(fill = total_comparison[,3])) + scale_x_discrete(expand = c(0,0)) + 
+      scale_y_discrete(expand = c(0,0)) + scale_fill_gradientn(colours = matlab.like(100), name = paste("R-squared:", cond)) + 
+      theme(panel.background = element_blank(), panel.grid.major = element_blank(), panel.grid.minor = element_blank(), 
+            axis.title.x = element_blank(), axis.title.y = element_blank(), axis.ticks.x=element_blank(), 
+            axis.ticks.y=element_blank(), legend.position="bottom", legend.direction = "horizontal")
+    return(image)     # need this for the graph to show up
+  }
+  if (display_type == 2) {
+    image <- ggplot(total_comparison, aes(x = total_comparison[,1], y = factor(total_comparison[,2], 
+      level = c('Lower Left', 'Lower Right', 'Upper Left', 'Upper Right', 'Performance Index', 'Freezing', 'Open Field')))) + 
+      geom_tile(aes(fill = total_comparison[,4])) + scale_x_discrete(expand = c(0,0)) + 
+      scale_y_discrete(expand = c(0,0)) + scale_fill_gradientn(colours = rev(matlab.like(100)), name = paste("P-value:", cond)) + 
+      theme(panel.background = element_blank(), panel.grid.major = element_blank(), panel.grid.minor = element_blank(), 
+            axis.title.x = element_blank(), axis.title.y = element_blank(), axis.ticks.x=element_blank(), 
+            axis.ticks.y=element_blank(), legend.position="bottom", legend.direction = "horizontal")
+    return(image)
+  }
+}

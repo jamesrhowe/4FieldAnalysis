@@ -137,25 +137,29 @@ ui <- navbarPage("4-Quadrant-Analysis", theme = shinytheme("cosmo"),
                               selectInput("conditionIDcompare", label = "Choose comparison condition", choices = conditionlist),
                               selectInput("compare_X_axis", label = "Choose comparison X-axis metric", choices = comparelist),
                               selectInput("compare_Y_axis", label = "Choose comparison Y-axis metric", choices = comparelist),
+                              radioButtons("heatmap_type", h4("Heatmap Data Type"), choices = list("R-squared" = 1, "P-value" = 2), selected = 1),
                               downloadButton("downloadCompareGraph", label = "Download Comparison Graph"),
+                              downloadButton("downloadCompareStats", label = "Download Comparison Stats"),
                               downloadButton("downloadCompareHeatmap", label = "Download Comparison Heatmap"),
                               downloadButton("downloadCompareTable", label = "Download Comparison Table")
                             ),
                             mainPanel(
                               tabsetPanel(
-                                tabPanel("Graph", plotOutput("ComparePlot")),
+                                tabPanel("Graph", 
+                                         plotOutput("ComparePlot"),
+                                         verbatimTextOutput("CompareStats")),
                                 tabPanel("Heatmap", plotOutput("CompareHeatmap")),
-                                tabPanel("Table", plotOutput("CompareTable"))
+                                tabPanel("Table", tableOutput("CompareTable"))
                               )
                             )
                           )
                  ),
-                 tags$script("$(document).on('shiny:connected', function(event) {    # this is needed to match the size of the downloaded graph with the size of the graph being displayed
-                             var myWidth = $(window).width();
+                 tags$script("$(document).on('shiny:connected', function(event) {
+var myWidth = $(window).width();
                              Shiny.onInputChange('shiny_width',myWidth)
                              
                              });"),
-
+                 
                  tags$script("$(document).on('shiny:connected', function(event) {
                              var myHeight = $(window).height();
                              Shiny.onInputChange('shiny_height',myHeight)

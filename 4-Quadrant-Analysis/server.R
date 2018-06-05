@@ -60,8 +60,8 @@ server <- function(input, output, session) {
   })
   output$CompareHeatmap <- renderPlot({
     updateplot()
-    #INSERT HERE
-  })
+    Compare_Heatmap(results2, input$conditionIDcompare, input$heatmap_type)
+  }, width = 720, height = 720, res = 72)
   # display stats
   output$QuadAnalysis <- renderPrint({
     updateplot()
@@ -82,10 +82,14 @@ server <- function(input, output, session) {
     updateplot()
     MEANOVA(results2, 9)
   })
+  output$CompareStats <- renderPrint({
+    updateplot()
+    LinReg_Display(results2, input$compare_X_axis, input$compare_Y_axis, input$conditionIDcompare)
+  })
   output$CompareTable <- renderTable({
     updateplot()
-    #INSERT HERE
-  })
+    Total_Compare(results2, input$conditionIDcompare)
+  }, striped = TRUE, hover = TRUE, bordered = TRUE)
   #download data
   output$downloadResults <- downloadHandler(
     filename = function() {
@@ -174,7 +178,8 @@ server <- function(input, output, session) {
     },
     content = function(file) {
       image <- QuadComp(results2)
-      png(file, height = 1667, width = (input$shiny_width * 4.16667), res = 300, bg = "transparent")
+      wide <- input$shiny_width     # will not give output if width is direct input
+      png(file, height = 1667, width = (wide * 4.16667), res = 300, bg = "transparent")
       print(image)
       dev.off()
     }
@@ -185,7 +190,8 @@ server <- function(input, output, session) {
     },
     content = function(file) {
       image <- PerfInd(results2)
-      png(file, height = 1667, width = (input$shiny_width * 4.16667), res = 300, bg = "transparent")
+      wide <- input$shiny_width     # will not give output if width is direct input
+      png(file, height = 1667, width = (wide * 4.16667), res = 300, bg = "transparent")
       print(image)
       dev.off()
     }
@@ -196,7 +202,8 @@ server <- function(input, output, session) {
     },
     content = function(file) {
       image <- OFFComp(results2, 9, label = "Center Occupancy (%)")
-      png(file, height = 1667, width = (input$shiny_width * 4.16667), res = 300, bg = "transparent")
+      wide <- input$shiny_width     # will not give output if width is direct input
+      png(file, height = 1667, width = (wide * 4.16667), res = 300, bg = "transparent")
       print(image)
       dev.off()
     }
@@ -207,7 +214,8 @@ server <- function(input, output, session) {
     },
     content = function(file) {
       image <- OFFComp(results2, 8, label = "Time Immobile (%)")
-      png(file, height = 1667, width = (input$shiny_width * 4.16667), res = 300, bg = "transparent")
+      wide <- input$shiny_width     # will not give output if width is direct input
+      png(file, height = 1667, width = (wide * 4.16667), res = 300, bg = "transparent")
       print(image)
       dev.off()
     }
@@ -297,6 +305,34 @@ server <- function(input, output, session) {
       dev.off()
     }
   )
+  output$downloadCompareGraph <- downloadHandler(
+    filename = function() {
+      paste(input$compare_X_axis, "+", input$compare_Y_axis, Sys.Date(), input$conditionIDcompare, "Comparison Graph.png")
+    },
+    content = function(file) {
+      image <- AxisCompare(results2, input$compare_X_axis, input$compare_Y_axis, input$conditionIDcompare)
+      wide <- input$shiny_width     # will not give output if width is direct input
+      png(file, height = 1667, width = (wide * 4.16667), res = 300, bg = "transparent")
+      print(image)
+      dev.off()
+    }
+  )
+  output$downloadCompareHeatmap <- downloadHandler(
+    filename = function() {
+      if (input$heatmap_type == 1) {
+        paste0("ComparisonHeatmap_", input$conditionIDcompare, "_R-squared_", Sys.Date(), ".png") 
+      }
+      if (input$heatmap_type == 2) {
+        paste0("ComparisonHeatmap_", input$conditionIDcompare, "_P-value_", Sys.Date(), ".png")
+      }
+    },
+    content = function(file) {
+      image <- Compare_Heatmap(results2, input$conditionIDcompare, input$heatmap_type)
+      png(file, height = 3000, width = 3000, res = 300, bg = "transparent")
+      print(image)
+      dev.off()
+    }
+  )
   #download stats
   output$downloadQuadStats <- downloadHandler(
     filename = function() {
@@ -338,6 +374,24 @@ server <- function(input, output, session) {
     content = function(file) {
       statout <- MEANOVA(results2, 9)
       write(statout, file)
+    }
+  )
+  output$downloadCompareStats <- downloadHandler(
+    filename = function() {
+      paste(input$compare_X_axis, input$compare_Y_axis, Sys.Date(), input$conditionIDcompare, "Comparison Stats.txt")
+    },
+    content = function(file) {
+      statout <- LinReg_Display(results2, input$compare_X_axis, input$compare_Y_axis, input$conditionIDcompare)
+      write(statout, file)
+    }
+  )
+  output$downloadCompareTable <- downloadHandler(
+    filename = function() {
+      paste(input$conditionIDcompare, Sys.Date(), "Total Comparison Fit Summaries.csv")
+    },
+    content = function(file) {
+      Total_Compare(results2, input$conditionIDcompare) 
+      write.csv(total_comparison, file)
     }
   )
   # transform data

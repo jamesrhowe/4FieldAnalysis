@@ -214,3 +214,60 @@ MEANOVA <- function(x, coln) {
     return(capture.output(summary(aovx), Anova(aovx, type = "III"), summary(anovax), TukeyHSD(anovax))) 
   }
 }
+
+# Linear regression statistics for metric comparisons
+LinReg_Compare <- function(x, x_cond, y_cond, cond) {
+  x2 <- na.omit(x)
+  x2[,7] <- x2[,7] / 100      # needed to prevent performance index values from being inflated
+  num_x <<- grep(x_cond, comparelist)      # makes much more efficient than many nested if() statements
+  num_y <<- grep(y_cond, comparelist)
+  colnames(x2)[num_x + 2] <- "x_condition"
+  if (x_cond == y_cond) {     # need this to ensure that no errors occur if the same metric is used on both axes
+    x2$y_condition <- x2$x_condition
+  }
+  else {
+    colnames(x2)[num_y + 2] <- "y_condition" 
+  }
+  x2$x_condition <- x2$x_condition * 100      # to turn decimal into percentage for graph
+  x2$y_condition <- x2$y_condition * 100
+  current_comparison <<- x2
+}
+
+# Creating table of both R-squared and P-values of all comparisons
+Total_Compare <- function(x, cond) {
+  x2 <- na.omit(x)
+  x2[,7] <- x2[,7] / 100      # needed to prevent performance index values from being inflated
+  if (cond != "Full") {
+    total_comparison <- x2[grep(cond, x2$Condition),]
+  }
+  if (cond == "Full") {
+    total_comparison <- x2
+  }
+  total_comparison <- total_comparison[,3:9]
+  total_comparison <- total_comparison * 100    # not strictly necessary, but most likely best for a uniform transformation compared with the more detailed summaries
+  total_rsquared <- as.data.frame(matrix(0, nrow = 7, ncol = 7), row.names = colnames(total_comparison))
+  total_pvalues <- as.data.frame(matrix(0, nrow = 7, ncol = 7), row.names = colnames(total_comparison))
+  colnames(total_rsquared) <- colnames(total_comparison)
+  colnames(total_pvalues) <- colnames(total_comparison)
+  for (i in 1:7) {
+    for (j in 1:7) {
+      total_regression <- cbind.data.frame(total_comparison[,i], total_comparison[,j])
+      colnames(total_regression) <- c('x', 'y')
+      total_regression <- lm(y ~ x, total_regression)
+      total_rsquared[i,j] <- summary(total_regression)$r.squared    # gets the r-squared value that is normally returned for the linear model
+      f <- summary(total_regression)$fstatistic     # gets the p value of this comparison
+      p <- pf(f[1],f[2],f[3],lower.tail=F)
+      attributes(p) <- NULL     # ensures this is only the value and not the metadata as well
+      total_pvalues[i,j] <- p
+    }
+  }
+  total_comparison <- cbind.data.frame(melt(total_rsquared)[,1], colnames(total_rsquared), melt(total_rsquared)[,2], melt(total_pvalues)[,2])     # need this to order the columns correctly
+  if (cond == "Full") {
+    colnames(total_comparison) <- c("Measure 1: Full", "Measure 2: Full", "R-squared", "P-value")
+  }
+  if (cond != "Full") {
+    colnames(total_comparison) <- c(paste("Measure 1:", cond), paste("Measure 2:", cond), "R-squared", "P-value")
+  }
+  total_comparison <<- total_comparison     # cannot finalize until final step or else will return original input
+  return(total_comparison)
+}

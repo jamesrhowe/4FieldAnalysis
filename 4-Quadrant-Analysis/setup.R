@@ -14,6 +14,8 @@ library(car)    #needed for good anova function that can take a mixed linear mod
 library(multcomp)     #needed for doing multiple comparisons for the mixed two-factor ANOVA
 library(scales)     #contains pretty_breaks() which allows for publication-quality x axes
 library(evaluate)    # for debugging
+library(covr)     # for CI integration
+library(colorRamps)     # for heatmap colors
 
 # create initial summary dataframes
 results <<- c(0, 0, 0, 0, 0, 0, 0, 0, 0)
