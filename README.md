@@ -1,11 +1,11 @@
-4-Quadrant-Analysis
+4FieldAnalysis
 ===================
 
  [![Build Status](https://travis-ci.org/jamesrhowe/4-Quadrant-Analysis.svg?branch=master)](https://travis-ci.org/jamesrhowe/4-Quadrant-Analysis)
  [![Coverage Status](https://coveralls.io/repos/github/jamesrhowe/4-Quadrant-Analysis/badge.svg?branch=master)](https://coveralls.io/github/jamesrhowe/4-Quadrant-Analysis?branch=master)
  [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-4-Quadrant-Analysis is a dynamic dashboard application for data analysis, written in R and implemented using the Shiny framework. This application is designed to analyze behavioral data gathered using the 4 Quadrant Chamber assay to find the innate valence and fear/anxiety response associated with a given olfactory or optogenetic stimulus.
+4FieldAnalysis (4FA) is a dynamic dashboard application for data analysis, written in R and implemented using the Shiny framework. This application is designed to analyze behavioral data gathered using the 4 quadrant open field chamber behavioral assay to find the innate valence and fear/anxiety response associated with a given olfactory or optogenetic stimulus.
 
 Initialization
 --------------
@@ -44,11 +44,11 @@ Usage
 
 #### Upload and Analyze Data
 
-On the control panel, click the "Select" button and and choose a text file output from the 4 Quadrant Chamber. Replace the placeholder text for the baseline and stimulus identities with the trial's relevant conditions, and choose the periods of time for analysis before and during the stimulus. To perform all analyses, simply click the "Analyze" button. This application includes four 30-minute sample trials for testing in the `test-data` directory.  
+On the control panel, click the "Select" button and and choose a text file output from the 4 quadrant open field chamber. Replace the placeholder text for the baseline and stimulus identities with the trial's relevant conditions, and choose the periods of time for analysis before and during the stimulus. To perform all analyses, simply click the "Analyze" button. This application includes four 30-minute sample trials for testing in the `test-data` directory.  
 
 #### Select Measures of Interest
 
-This application can analyze both individual and grouped trial performance in the 4 Quadrant Chamber, in full and subdivided into control and stimulus conditions. 
+This application can analyze both individual and grouped trial performance in the 4 quadrant open field chamber, in full and subdivided into control and stimulus conditions. 
 
 For each individual trial, the application can display the entire path traveled by the mouse in the chamber over the time series of interest. It can also track the instantaneous velocity at each time point, and summarize it over the course of the time series in a single graph. 
 
@@ -65,4 +65,4 @@ All displayed graphics can be downloaded on the pages where they appear, and the
 License
 -------
 
-4-Quadrant-Analysis may be used, copied, or modified without restrictions under the terms of the MIT License.
+4FA may be used, copied, or modified without restrictions under the terms of the MIT License.
