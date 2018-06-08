@@ -1,5 +1,5 @@
 source("setup.R")     # needed to initialize the app
-ui <- navbarPage("4-Quadrant-Analysis", theme = shinytheme("cosmo"),
+ui <- navbarPage("4FieldAnalysis", theme = shinytheme("cosmo"),
                  # control panel page
                  tabPanel("Upload",
                           sidebarLayout(
