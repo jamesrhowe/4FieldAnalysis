@@ -1,4 +1,5 @@
 source("setup.R")     # needed to initialize the app
+
 ui <- navbarPage("4FieldAnalysis", theme = shinytheme("cosmo"),
                  # control panel page
                  tabPanel("Upload",
@@ -29,6 +30,8 @@ ui <- navbarPage("4FieldAnalysis", theme = shinytheme("cosmo"),
                  # page for summaries of individual trials
                  tabPanel("Trial Summary",
                           sidebarPanel(
+                            img(src='Quadrants-small.png', align = "left"),
+                            img(src='OpenField-small.png', align = "right"),
                             selectInput("selectedfile1", label = "Choose trial", choices = filelist),
                             selectInput("infotypeind", label = "Choose time series metric", choices = c("Quadrant Occupancy", "Freezing", "Center Occupancy")),
                             radioButtons("typeoftime", h4("Time Series Format"), choices = list("Proportion" = 1, "Cumulative" = 2), selected = 1),
@@ -52,6 +55,7 @@ ui <- navbarPage("4FieldAnalysis", theme = shinytheme("cosmo"),
                  tabPanel("Quadrants",
                           sidebarLayout(
                             sidebarPanel(
+                              img(src='Quadrants-large.png', align = "center"),
                               h3("Quadrant Occupancy"),
                               selectInput("quadrant", label = "Choose quadrant", choices = c("Lower Right", "Lower Left", "Upper Right", "Upper Left")),
                               selectInput("conditionIDquad", label = "Choose time series condition", choices = conditionlist),
@@ -111,6 +115,7 @@ ui <- navbarPage("4FieldAnalysis", theme = shinytheme("cosmo"),
                  tabPanel("Open Field",
                           sidebarLayout(
                             sidebarPanel(
+                              img(src='OpenField-large.png', align = "center"),
                               h3("Center Occupancy"),
                               selectInput("conditionIDOF", label = "Choose time series condition", choices = conditionlist),
                               radioButtons("typeoftimeOF", h4("Time Series Format"), choices = list("Proportion" = 1, "Cumulative" = 2), selected = 1),

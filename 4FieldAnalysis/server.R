@@ -1,17 +1,21 @@
 source("setup.R")     # needed to initialize the app
+
 server <- function(input, output, session) {
+  
   output$summarytable <- renderTable(show_summary(), na = "--")    # displays the summary table, and changes NA values to something more aesthetically pleasing
   output$resultstable <- renderTable(analyze_data(), na = "--")    # displays the results summary table, and then changes the NA values as well
   updateplot <- reactive(input$analyze)
+  
   # display stripe plots
   output$plottedpath <- renderPlot(PlotPath(get(input$selectedfile1)), 
                                    width = 720, height = 720, res = 72)    # locks dimensions to optimal resolution and to their most representative dimensions
   output$quadstripeind <- renderPlot(IndStripePlot(get(input$selectedfile1), 8, c("blue4", "red", "blue", "cornflowerblue")),
                                      width = 720, height = 60, res = 72)     # locks dimensions to match the velocity plot
-  output$ofstripeind <- renderPlot(IndStripePlot(get(input$selectedfile1), 17, c("grey", "purple4")), 
+  output$ofstripeind <- renderPlot(IndStripePlot(get(input$selectedfile1), 17, c("grey", "forestgreen")), 
                                    width = 720, height = 60, res = 72)
   output$velplotind <- renderPlot(VelocityPlot(get(input$selectedfile1)), 
                                   width = 720, height = 180, res = 72)    # gives a defined length to align the stripes to, allowing correspondence between different plots based on mutual information
+  
   # display graphs
   output$PIPlot <- renderPlot({ 
     updateplot()
@@ -48,7 +52,7 @@ server <- function(input, output, session) {
   }, width = 720, height = 240, res = 72)
   output$OFStripeAll <- renderPlot({
     updateplot()
-    GroupStripe(input$conditionIDOF, "OF", c("grey", "purple4"))
+    GroupStripe(input$conditionIDOF, "OF", c("grey", "forestgreen"))
   }, width = 720, height = 240, res = 72)
   output$FreezeStripeAll <- renderPlot({
     updateplot()
@@ -62,6 +66,7 @@ server <- function(input, output, session) {
     updateplot()
     Compare_Heatmap(results2, input$conditionIDcompare, input$heatmap_type)
   }, width = 720, height = 720, res = 72)
+  
   # display stats
   output$QuadAnalysis <- renderPrint({
     updateplot()
@@ -90,6 +95,7 @@ server <- function(input, output, session) {
     updateplot()
     Total_Compare(results2, input$conditionIDcompare)
   }, striped = TRUE, hover = TRUE, bordered = TRUE)
+  
   #download data
   output$downloadResults <- downloadHandler(
     filename = function() {
@@ -124,7 +130,7 @@ server <- function(input, output, session) {
       paste(input$selectedfile1, "quadrant stripe.png")
     },
     content = function(file) {
-      image <- QuadrantStripePlot(get(input$selectedfile1))
+      image <- IndStripePlot(get(input$selectedfile1), 8, c("blue4", "red", "blue", "cornflowerblue"))
       png(file, width = 3000, height = 250, res = 300)
       print(image)
       dev.off()
@@ -135,7 +141,7 @@ server <- function(input, output, session) {
       paste(input$selectedfile1, "open field stripe.png")
     },
     content = function(file) {
-      image <- OpenFieldStripePlot(get(input$selectedfile1))
+      image <- IndStripePlot(get(input$selectedfile1), 17, c("grey", "forestgreen"))
       png(file, width = 3000, height = 250, res = 300)
       print(image)
       dev.off()
@@ -167,8 +173,8 @@ server <- function(input, output, session) {
       paste0("OFStripe_",input$conditionIDOF, "_", Sys.Date(), ".png")
     },
     content = function(file) {
-      image <- OpenFieldStripe(input$conditionIDOF)
-      png(file, width = 3000, height = 1500, res = 300)
+      image <- GroupStripe(input$conditionIDOF, "OF", c("grey", "forestgreen"))
+      png(file, width = 3000, height = 1000, res = 300)
       print(image)
       dev.off()
     })
@@ -333,6 +339,7 @@ server <- function(input, output, session) {
       dev.off()
     }
   )
+  
   #download stats
   output$downloadQuadStats <- downloadHandler(
     filename = function() {
@@ -394,6 +401,7 @@ server <- function(input, output, session) {
       write.csv(total_comparison, file)
     }
   )
+  
   # transform data
   show_summary <- eventReactive(input$analyze, {
     file <- input$upload
