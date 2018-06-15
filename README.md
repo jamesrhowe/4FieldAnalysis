@@ -14,7 +14,7 @@ Initialization
 #### Implementations
 This tool has 2 current implementations.
 
-*Online/Remote*: Hosted at jamesrhowe.shinyapps.io/4-quadrant-analysis. It requires no user installation or initialization. (Currently undeployed due to server issues)
+*Online/Remote*: Hosted at https://jamesrhowe.shinyapps.io/4fieldanalysis/. It requires no user installation or initialization.
 
 *Local*: Hosted on a local repository and accessible from the command line. Requires user installation and setup.
 
