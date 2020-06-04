@@ -7,7 +7,7 @@ source("analysisfunctions.R")     # contains all the analytic functions, makes p
 # Path plot to summarize total mouse motion
 PlotPath <- function(x) {
   ggplot(x, aes(x = XCoordinate, y = YCoordinate)) + geom_rect(aes(xmin = 0, xmax = Inf, ymin = -Inf, ymax = 0), fill = "lightcoral", alpha = 0.03) +
-    geom_rect(aes(xmin = -13, xmax = 13, ymin = -13, ymax = 13), fill = "grey", alpha = 0.01) +
+    geom_rect(aes(xmin = -15, xmax = 15, ymin = -15, ymax = 15), fill = "grey", alpha = 0.01) +
     geom_path(colour = "blue") + geom_hline(yintercept = 0, linetype = 2) + geom_vline(xintercept = 0, linetype = 2) +
     theme(panel.background = element_blank(), panel.grid.major = element_blank(), panel.grid.minor = element_blank(), 
           axis.title.x=element_blank(), axis.text.x=element_blank(), axis.ticks.x=element_blank(),

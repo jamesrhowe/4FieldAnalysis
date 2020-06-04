@@ -86,10 +86,10 @@ Velocity <- function(x) {
 OpenField <- function(x) {
   size1 <<- dim(t(x))[1] + 1
   for (i in 1:as.numeric(dim(x)[1])) {
-    if (x[i,2] > -13) {
-      if (x[i,2] < 13) {
-        if (x[i,3] > -13) {
-          if (x[i,3] < 13) {
+    if (x[i,2] > -15) {
+      if (x[i,2] < 15) {
+        if (x[i,3] > -15) {
+          if (x[i,3] < 15) {
             x[i,size1] <- "Center"
             x[i,(size1+1)] <- 1
           }

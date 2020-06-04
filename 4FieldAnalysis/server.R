@@ -404,21 +404,22 @@ server <- function(input, output, session) {
   
   # transform data
   show_summary <- eventReactive(input$analyze, {
-    file <- input$upload
-    namedfile <<- file$name
+    for (i in 1:length(input$upload[,1])) {
+    namedfile <<- input$upload[[i, "name"]]
     baseline_period <<- input$baselinePeriod
     treatment_period <<- input$treatmentPeriod
     size3 <<- as.numeric(dim(summarized)[1])
     summarized[size3,] <<- c(namedfile, input$treatmentID, min(baseline_period), max(baseline_period), min(treatment_period), max(treatment_period))
-    summarized <<- rbind.data.frame(summarized, c(NA, NA, NA, NA, NA, NA))
+    summarized <<- rbind.data.frame(summarized, c(NA, NA, NA, NA, NA, NA))}
     return(summarized)
   })
   analyze_data <- eventReactive(input$analyze, {
     withProgress(message = "Uploading data", detail = "Reading settings...", expr = {
       # run initial analysis on whole data file
-      file <- input$upload
-      analyzed <<- read.table(file$datapath)
-      namedfile <<- file$name     # needed to output the name of the file into the individual file selector menu
+    for (i in 1:length(input$upload[,1])) {
+      analyzed <<- read.table(input$upload[[i, "datapath"]])
+      analyzed <<- analyzed[1:5990,]
+      namedfile <<- input$upload[[i, "name"]]     # needed to output the name of the file into the individual file selector menu
       baseline_period <<- input$baselinePeriod
       treatment_period <<- input$treatmentPeriod
       setProgress(value = .3, message = "Analyzing time series data", detail = "Calculating velocity and freezing...")
@@ -447,7 +448,8 @@ server <- function(input, output, session) {
       # divide into baseline and treatments
       baseline_data <- analyzed[((min(baseline_period)*240)+1):((max(baseline_period)*240)+1),]
       colnames(baseline_data)[1:3] <- c("Time", "XCoordinate", "YCoordinate")
-      treatment_data <- analyzed[((min(treatment_period)*240)+1):((max(treatment_period)*240)+1),]
+      # need to offset treatment period by 5 seconds to accommodate data formatting
+      treatment_data <- analyzed[(min(treatment_period)*240-5):(max(treatment_period)*240-5),]
       colnames(treatment_data)[1:3] <- c("Time", "XCoordinate", "YCoordinate")
       setProgress(value = .8, message = "Analyzing collated data", detail = "Calculating summary statistics...")
       assign(paste(namedfile,"||",input$baselineID), baseline_data, .GlobalEnv)
@@ -477,7 +479,7 @@ server <- function(input, output, session) {
       results2[size1,] <<- c(results[size1,1:9], input$treatmentID, "Treatment")
       setProgress(value = .9, message = "Analyzing collated data", detail = "Normalizing treatment time series...")
       assign(paste(namedfile,"||",input$treatmentID), treatment_data, .GlobalEnv)
-      results <<- rbind.data.frame(results, c(NA, NA, NA, NA, NA, NA, NA))
+      results <<- rbind.data.frame(results, c(NA, NA, NA, NA, NA, NA, NA))}
       return(results)
     })
   })
